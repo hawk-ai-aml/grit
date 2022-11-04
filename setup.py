@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="noroutine-grit",
-    version="0.0.8",
+    version="0.0.9",
     author='Oleksii Khilkevych',
     author_email="oleksiy@noroutine.me",
     maintainer="Noroutine GmbH",
@@ -24,7 +24,7 @@ setuptools.setup(
     license="MIT",
     install_requires=[
         "attrs",
-        "grafanalib",
+        "grafanalib==0.6.3",
         "pydantic",
         "pydantic-argparse",
         "python-decouple",
