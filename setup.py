@@ -25,7 +25,7 @@ setuptools.setup(
     install_requires=[
         "attrs",
         "grafanalib==0.6.3",
-        "pydantic",
+        "pydantic==1.9.1",
         "pydantic-argparse",
         "python-decouple",
         "python-dotenv",
