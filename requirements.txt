@@ -2,7 +2,7 @@ attrs==21.4.0
 autopep8==1.6.0
 certifi==2022.5.18.1
 charset-normalizer==2.0.12
-grafanalib==0.6.3
+grafanalib==0.7.1
 idna==3.3
 pycodestyle==2.8.0
 pydantic==1.9.1

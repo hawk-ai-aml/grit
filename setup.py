@@ -24,7 +24,7 @@ setuptools.setup(
     license="MIT",
     install_requires=[
         "attrs==21.4.0",
-        "grafanalib==0.6.3",
+        "grafanalib==0.7.1",
         "pydantic==1.9.1",
         "pydantic-argparse==0.5.0",
         "python-decouple==3.6",
