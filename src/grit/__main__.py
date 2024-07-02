@@ -120,7 +120,7 @@ class GenerateCommand(BaseModel):
                 for _obj_name in folder_module.__dict__:
                     _obj = folder_module.__dict__[_obj_name]
 
-                    if isinstance(_obj, Dashboard):
+                    if isinstance(_obj, Dashboard) or isinstance(_obj, AlertFileBasedProvisioning):
                         with open(f"{out_base_dir}/{folder_uid}/{_obj.uid}.json", "w") as file:
                             file.write(json.dumps(
                                 _obj.to_json_data(), sort_keys=True, indent=2, cls=DashboardEncoder))
