@@ -27,7 +27,7 @@ dependencies = [
     "python-dotenv==0.20.0",
     "PyYAML==6.0",
     "requests==2.28.0",
-    "GrafanaLib git+https://github.com/hawk-ai-aml/grafanalib.git@feature/grafana-11"
+    "grafanalib @ git+https://github.com/hawk-ai-aml/grafanalib.git@feature/grafana-11"
 ]
 
 [tool.setuptools.package-dir]
