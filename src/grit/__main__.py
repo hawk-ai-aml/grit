@@ -108,7 +108,7 @@ class GenerateCommand(BaseModel):
                 module=self.module, **resolved_variations_subst)
 
             print(f"Generating {out_base_dir}")
-            os.makedirs(f"{out_base_dir}/alert_groups  ", exist_ok=True)
+            os.makedirs(f"{out_base_dir}/alert_groups", exist_ok=True)
             
             for folder_module in Grit.get_folder_modules(self.module):
                 folder_uid = Folder.get_uid(folder_module)
