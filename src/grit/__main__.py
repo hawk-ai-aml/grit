@@ -4,7 +4,7 @@ import importlib
 from typing import Optional
 
 from itertools import product
-from grafanalib.core import AlertGroup
+from grafanalib.core import AlertGroup, Dashboard, AlertFileBasedProvisioning
 from pydantic import Field
 
 import yaml
@@ -128,6 +128,11 @@ class GenerateCommand(BaseModel):
                         with open(f"{out_base_dir}/{folder_uid}/{_obj.name}.json", "w") as file:
                             file.write(json.dumps(
                                 _obj.to_json_data(), sort_keys=True, indent=2, cls=DashboardEncoder))
+                            
+                    if isinstance(_obj, AlertFileBasedProvisioning):
+                        with open(f"{out_base_dir}/{folder_uid}/something.json", "w") as file:
+                            file.write(json.dumps(
+                                _obj.to_json_data(), sort_keys=True, indent=2, cls=DashboardEncoder))                            
 
 
 class Arguments(BaseModel):
