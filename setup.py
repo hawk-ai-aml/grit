@@ -26,6 +26,9 @@ setuptools.setup(
     python_requires='>=3.9, <4',
     license="MIT",
     install_requires=requirements,
+    dependency_links=[
+        "git+https://github.com/hawk-ai-aml/grafanalib.git@feature/grafana-11#egg=grafanalib"
+    ],
     package_dir={
         "": "src"
     }
