@@ -10,7 +10,7 @@ from .helpers import gen_random_str
 ALERT_RULES_MAGIC_STR = '__alert_rules__'
 
 @define
-class GritAlert(grafanalib.core.AlertFileBasedProvisioning):
+class GritAlert(grafanalib.core.AlertGroup):
     """
     Compose dashboard from Stack
 
