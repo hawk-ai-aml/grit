@@ -39,3 +39,16 @@ class GritDash(grafanalib.core.Dashboard):
             return p
 
         self.panels = list(map(dataSource_override, self.stack.to_panels()))
+
+@define
+class GritAlert(grafanalib.core.AlertFileBasedProvisioning):
+    """
+    Compose dashboard from Stack
+
+    """
+
+    def __init__(self, **kwargs):
+        self.__attrs_init__(**kwargs)
+        caller = inspect.currentframe().f_back
+        caller_module = sys.modules[caller.f_globals['__name__']]
+        setattr(caller_module, DASHBOARD_MAGIC_STR + gen_random_str(), self)
