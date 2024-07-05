@@ -124,13 +124,9 @@ class GenerateCommand(BaseModel):
                         with open(f"{out_base_dir}/{folder_uid}/{_obj.uid}.json", "w") as file:
                             file.write(json.dumps(
                                 _obj.to_json_data(), sort_keys=True, indent=2, cls=DashboardEncoder))
-                    if isinstance(_obj, AlertGroup):
-                        with open(f"{out_base_dir}/{folder_uid}/{_obj.name}.json", "w") as file:
-                            file.write(json.dumps(
-                                _obj.to_json_data(), sort_keys=True, indent=2, cls=DashboardEncoder))
                             
                     if isinstance(_obj, AlertFileBasedProvisioning):
-                        with open(f"{out_base_dir}/{folder_uid}/something.json", "w") as file:
+                        with open(f"{out_base_dir}/alert_groups/{_obj.uid}.json", "w") as file:
                             file.write(json.dumps(
                                 _obj.to_json_data(), sort_keys=True, indent=2, cls=DashboardEncoder))                            
 
