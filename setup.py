@@ -22,16 +22,7 @@ setuptools.setup(
     ],
     python_requires='>=3.9, <4',
     license="MIT",
-    install_requires=[
-        "attrs==21.4.0",
-        "git+https://github.com/hawk-ai-aml/grafanalib.git@feature/grafana-11",
-        "pydantic==1.9.1",
-        "pydantic-argparse==0.5.0",
-        "python-decouple==3.6",
-        "python-dotenv==0.20.0",
-        "PyYAML==6.0",
-        "requests==2.28.0",
-    ],
+    install_requires=requirements,
     package_dir={
         "": "src"
     }
