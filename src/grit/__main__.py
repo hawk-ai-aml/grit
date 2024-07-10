@@ -108,7 +108,7 @@ class GenerateCommand(BaseModel):
                 module=self.module, **resolved_variations_subst)
             
             out_base_dir_test = self.out.format(
-                module=self.module + "alert_rules", **resolved_variations_subst)
+                module="alert_rules", **resolved_variations_subst) + "alert_rules/"
 
             print(f"Generating {out_base_dir}")
             print(f"Generating TEST {out_base_dir_test}")
