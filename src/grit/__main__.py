@@ -106,9 +106,13 @@ class GenerateCommand(BaseModel):
 
             out_base_dir = self.out.format(
                 module=self.module, **resolved_variations_subst)
+            
+            out_base_dir_test = self.out.format(
+                module=self.module + "alert_rules", **resolved_variations_subst)
 
             print(f"Generating {out_base_dir}")
-            os.makedirs(f"{out_base_dir}/alert_groups", exist_ok=True)
+            print(f"Generating TEST {out_base_dir_test}")
+            os.makedirs(f"out/dev/alert_rules/", exist_ok=True)
             
             for folder_module in Grit.get_folder_modules(self.module):
                 folder_uid = Folder.get_uid(folder_module)
@@ -127,10 +131,9 @@ class GenerateCommand(BaseModel):
                                 _obj.to_json_data(), sort_keys=True, indent=2, cls=DashboardEncoder))
                             
                     if isinstance(_obj, AlertFileBasedProvisioning):
-                        with open(f"{out_base_dir}/alert_groups/{_obj.uid}.json", "w") as file:
+                        with open(f"out/dev/alert_rules/{_obj.uid}.json", "w") as file:
                             file.write(json.dumps(
                                 _obj.to_json_data(), sort_keys=True, indent=2, cls=DashboardEncoder))                            
-
 
 class Arguments(BaseModel):
     debug: bool = False
