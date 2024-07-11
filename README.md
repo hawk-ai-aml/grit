@@ -1,7 +1,9 @@
 Grid Toolkit for Grafana
 ===
 
-Generate similar but varying dashboards from code with many variations for hundreds of environments. Based on grafanalib
+Generate similar but varying dashboards from code with many variations for hundreds of environments. Based on a forked grafanalib which is maintained by HAWK.
+
+This open source project supports Grafana v11.+ dashboards, alert_rules and notifications.
 
 ## Installation and Quick Start
 
@@ -9,7 +11,7 @@ Generate similar but varying dashboards from code with many variations for hundr
 ❯❯❯ virtualenv .py3
 ❯❯❯ source .py3/bin/activate
 
-❯❯❯ pip install noroutine-grit
+❯❯❯ pip install .
 
 ❯❯❯ python -m grit -h
 
@@ -66,6 +68,53 @@ GritDash(
         row3(panel1, panel2, panel3, panel4, panel5),
     )
 )
+```
+
+Example alert rules
+
+```python
+
+    GritAlert(
+        groups=[AlertGroup(
+        name="TestGroup",
+        rules=[AlertRulev11(
+                title="Provisioning TEST v4.24",
+                triggers=[
+                  CloudwatchMetricsTarget(
+                      region="default",
+                      namespace="AWS/EC2",
+                      metricName="CPUUtilization",
+                      statistics=["Average"],
+                      dimensions={'InstanceId': '*'},
+                      matchExact=True,
+                      refId='A',
+                  ),
+                  AlertExpression(
+                      refId="B",
+                      expressionType=EXP_TYPE_REDUCE,
+                      expression='A',
+                      reduceFunction='mean',
+                      reduceMode=EXP_REDUCER_MODE_STRICT
+                  )],
+                annotations={
+                    "summary": "High CPU Utilization on AWS EC2 instances",
+                    "__dashboardUid__": "uid-ec2-alerts",
+                    "__panelId__": "1"
+                },
+                labels={"severity": "critical", "notification": "slack"},
+                condition="C",
+                evaluateFor="1m",
+                uid="alertTest",
+                dashboard_uid="uid-ec2-alerts",
+                panel_id=1
+      )
+    ],
+        folder="TEST",
+        evaluateInterval="1m"
+    )],
+        uid="uid-alert-group",
+    )
+
 ```
 
 # Variations
