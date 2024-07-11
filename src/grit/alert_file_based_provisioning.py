@@ -1,7 +1,7 @@
 import inspect
 import sys
 
-from attr import define
+from attr import define, field, ib
 
 import grafanalib.core
 
@@ -14,7 +14,12 @@ class GritAlert(grafanalib.core.AlertFileBasedProvisioning):
     """
     Initialize and group Alert Groups
 
+    :param groups: list of alert groups
+    :param uid: unique identifier to generate the alert file
+
     """
+    groups: grafanalib.core.AlertGroup = ib()
+    uid: str = ib()
 
     def __init__(self, **kwargs):
         self.__attrs_init__(**kwargs)

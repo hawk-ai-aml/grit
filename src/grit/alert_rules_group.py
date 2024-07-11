@@ -21,7 +21,7 @@ class AlertRulesGroup(grafanalib.core.AlertGroup):
 
     """
     name: str = field(default='')
-    rules: list[grafanalib.core.AlertRulev9] = field(default=[])
+    rules: list[grafanalib.core.AlertRulev11] = field(default=[])
     folder: str = field(default='alert')
     evaluateInterval: str = field(default='1m')
 

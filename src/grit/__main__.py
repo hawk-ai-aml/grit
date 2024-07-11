@@ -1,10 +1,9 @@
 from operator import mod
-import pkgutil
 import importlib
 from typing import Optional
 
 from itertools import product
-from grafanalib.core import AlertGroup, Dashboard, AlertFileBasedProvisioning
+from grafanalib.core import Dashboard, AlertFileBasedProvisioning
 from pydantic import Field
 
 import yaml
