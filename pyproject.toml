@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "grit"
-version = "1.0.0"
+version = "11.0.0"
 description = "Grid Toolkit for Grafana"
 readme = "README.md"
 keywords = ["grafana", "grafanalib", "generator"]

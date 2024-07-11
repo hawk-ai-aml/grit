@@ -1,4 +1,4 @@
-__version__ = "1.0.0"
+__version__ = "11.0.0"
 __author__ = "Noroutine GmbH <info@noroutine.me>"
 
 from .utilities import *

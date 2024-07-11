@@ -1,7 +1,9 @@
 Grid Toolkit for Grafana
 ===
 
-Generate similar but varying dashboards from code with many variations for hundreds of environments. Based on grafanalib
+Generate similar but varying dashboards from code with many variations for hundreds of environments. Based on a forked grafanalib which is maintained by HAWK.
+
+This open source project supports Grafana v11.+ dashboards, alert_rules and notifications.
 
 ## Installation and Quick Start
 
