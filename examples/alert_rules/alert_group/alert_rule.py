@@ -1,6 +1,6 @@
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.core import (
-    AlertRulev9, AlertExpression, EXP_TYPE_REDUCE, EXP_REDUCER_MODE_STRICT, EXP_TYPE_MATH, AlertGroup
+    AlertRulev11, AlertExpression, EXP_TYPE_REDUCE, EXP_REDUCER_MODE_STRICT, EXP_TYPE_MATH, AlertGroup
 )
 
 
@@ -8,7 +8,7 @@ def get_rule():
     return rule
 
 
-rule = AlertRulev9(
+rule = AlertRulev11(
     title="AWS EC2 | High CPU Utilization",
     triggers=[
         CloudwatchMetricsTarget(

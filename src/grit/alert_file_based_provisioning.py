@@ -1,7 +1,7 @@
 import inspect
 import sys
 
-from attr import define, field
+from attr import define
 
 import grafanalib.core
 
@@ -12,7 +12,7 @@ ALERT_RULES_MAGIC_STR = '__alert_rules__'
 @define
 class GritAlert(grafanalib.core.AlertFileBasedProvisioning):
     """
-    Compose dashboard from Stack
+    Initialize and group Alert Groups
 
     """
 

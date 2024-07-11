@@ -12,11 +12,12 @@ ALERT_RULES_MAGIC_STR = '__alert_rules__'
 @define
 class AlertRulesGroup(grafanalib.core.AlertGroup):
     """
-    Compose dashboard from Stack
+    Compose Alert Rules Group
 
-    :param stack: stack of panel rows
-    :param dataSource: dataSource for panels
-    :param register: automatically register the dashboard
+    :param name: name of the dashboard
+    :param rules: list of alert rules
+    :param folder: folder name
+    :param evaluateInterval: evaluate interval
 
     """
     name: str = field(default='')
