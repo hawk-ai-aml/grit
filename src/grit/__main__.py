@@ -1,10 +1,9 @@
 from operator import mod
-import pkgutil
 import importlib
 from typing import Optional
 
 from itertools import product
-
+from grafanalib.core import Dashboard, AlertFileBasedProvisioning
 from pydantic import Field
 
 import yaml
@@ -106,9 +105,15 @@ class GenerateCommand(BaseModel):
 
             out_base_dir = self.out.format(
                 module=self.module, **resolved_variations_subst)
+            
+            out_base_dir_alerts = self.out.format(
+                module="alert_rules", **resolved_variations_subst) + "-alerts/"
 
             print(f"Generating {out_base_dir}")
-
+            print(f"Generating {out_base_dir_alerts}")
+            
+            os.makedirs(f"{out_base_dir_alerts}", exist_ok=True)
+            
             for folder_module in Grit.get_folder_modules(self.module):
                 folder_uid = Folder.get_uid(folder_module)
 
@@ -124,7 +129,11 @@ class GenerateCommand(BaseModel):
                         with open(f"{out_base_dir}/{folder_uid}/{_obj.uid}.json", "w") as file:
                             file.write(json.dumps(
                                 _obj.to_json_data(), sort_keys=True, indent=2, cls=DashboardEncoder))
-
+                            
+                    if isinstance(_obj, AlertFileBasedProvisioning):
+                        with open(f"{out_base_dir_alerts}/{_obj.uid}.json", "w") as file:
+                            file.write(json.dumps(
+                                _obj.to_json_data(), sort_keys=True, indent=2, cls=DashboardEncoder))                            
 
 class Arguments(BaseModel):
     debug: bool = False
