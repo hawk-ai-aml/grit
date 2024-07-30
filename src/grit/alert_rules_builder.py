@@ -16,7 +16,7 @@ class AlertRuleBuilder(ABC):
     An interface class for building alert rules.
     """
 
-    def __init__(self, environment, evaluateFor, uid_prefix, metric_namespace):
+    def __init__(self, environment, evaluateFor, uid_prefix):
         """
         Initialize the AlertRuleBuilder.
 
