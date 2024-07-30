@@ -3,9 +3,9 @@ from attr import define, field
 import grafanalib.core
 
 from grafanalib.core import (
-    Notification, AlertExpression,
+    AlertExpression,
     EXP_TYPE_REDUCE, EXP_TYPE_MATH, EXP_REDUCER_FUNC_DROP_NN, EXP_REDUCER_FUNC_LAST, CTYPE_QUERY,
-    AlertRulev11, AlertGroup, Target
+    AlertRulev11, Target, TimeRange
 )
 
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
@@ -28,7 +28,7 @@ class AlertRuleBuilder(ABC):
         self.evaluateFor = evaluateFor
         self.uid_prefix = uid_prefix
 
-    def register(self, title, metric, alert_expression, alert_msg, labels, __panelId__):
+    def register(self, title, metric, alert_expression, alert_msg, labels, __panelId__, time_range=TimeRange('5m', 'now')):
         """
         Register a new alert rule.
 
@@ -44,6 +44,7 @@ class AlertRuleBuilder(ABC):
             "title": title,
             "metric": metric,
             "alert_expression": alert_expression,
+            "time_range": time_range,
             "annotations": {
                 "summary": alert_msg
             },
@@ -76,6 +77,29 @@ class AlertRuleBuilder(ABC):
             __alert_rules__.extend(builder.build())
         return __alert_rules__
 
+    def convert_time_range_to_number(self, time_range):
+        """
+        Convert time range to seconds.
+
+        Args:
+            time_range (str): Time range in format '1h', '2d', '3w', etc.
+
+        Returns:
+            int: Time range in seconds.
+        """
+        if time_range == 'now':
+            return 0
+        elif time_range[-1] == 'm':
+            return int(time_range[:-1]) * 60
+        elif time_range[-1] == 'h':
+            return int(time_range[:-1]) * 3600
+        elif time_range[-1] == 'd':
+            return int(time_range[:-1]) * 86400
+        elif time_range[-1] == 'w':
+            return int(time_range[:-1]) * 604800
+        else:
+            return 0
+
 
 class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
     """
@@ -86,7 +110,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
         super().__init__(environment, evaluateFor, uid_prefix)
         self.metric_namespace = metric_namespace
 
-    def register(self, title, metric, reduce_function, alert_expression, alert_msg, labels, __panelId__):
+    def register(self, title, metric, reduce_function, alert_expression, alert_msg, labels, __panelId__, time_range=TimeRange('5m', 'now')):
         """
         Register a new alert rule.
 
@@ -98,19 +122,10 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
             alert_msg (str): The summary message for the alert.
             labels (dict): The labels associated with the alert rule.
             __panelId__ (str): The panel ID associated with the alert rule.
+            time_range (TimeRange): The time range for the alert rule. Default is '5m' to 'now'.
         """
-        rule = {
-            "title": title,
-            "metric": metric,
-            "reduce_function": reduce_function,
-            "alert_expression": alert_expression,
-            "annotations": {
-                "summary": alert_msg
-            },
-            "labels": labels,
-            "__panelId__": __panelId__
-        }
-        self.rules.append(rule)
+        super().register(title, metric, alert_expression, alert_msg, labels, __panelId__, time_range)
+        self.rules[-1]["reduce_function"] = reduce_function
 
     def build(self):
         """
@@ -124,6 +139,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
         """
         __alert_rules__=[]
         for _id, alert in enumerate(self.rules):
+
             __alert_rules__.append(
                 AlertRulev11(
                     title=alert["title"],
@@ -148,6 +164,8 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
                             expressionType=EXP_TYPE_MATH,
                             expression=alert["alert_expression"],
                         )],
+                    timeRangeFrom=self.convert_time_range_to_number(alert["time_range"].to_json_data()[0]),
+                    timeRangeTo=self.convert_time_range_to_number(alert["time_range"].to_json_data()[1]),
                     annotations=alert["annotations"],
                     labels=alert["labels"],
                     condition="ALERT_CONDITION",
@@ -198,6 +216,8 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
                             expressionType=EXP_TYPE_MATH,
                             expression=alert["alert_expression"],
                         )],
+                    timeRangeFrom=self.convert_time_range_to_number(alert["time_range"].to_json_data()[0]),
+                    timeRangeTo=self.convert_time_range_to_number(alert["time_range"].to_json_data()[1]),
                     annotations=alert["annotations"],
                     labels=alert["labels"],
                     condition="ALERT_CONDITION",
