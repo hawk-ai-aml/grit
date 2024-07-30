@@ -130,7 +130,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
                     triggers=[
                         CloudwatchMetricsTarget(
                             refId='QUERY',
-                            namespace=alert["metric"]["namespace"] or self.metric_namespace,
+                            namespace=alert["metric"].get("namespace", self.metric_namespace),
                             metricName=alert["metric"]["name"],
                             statistics=alert["metric"]["statistics"],
                             dimensions=alert["metric"]["dimensions"],
