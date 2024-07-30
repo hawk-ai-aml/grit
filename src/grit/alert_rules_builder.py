@@ -86,13 +86,14 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
         super().__init__(environment, evaluateFor, uid_prefix)
         self.metric_namespace = metric_namespace
 
-    def register(self, title, metric, alert_expression, alert_msg, labels, __panelId__):
+    def register(self, title, metric, reduce_function, alert_expression, alert_msg, labels, __panelId__):
         """
         Register a new alert rule.
 
         Args:
             title (str): The title of the alert rule.
             metric (dict): The metric configuration for the alert rule.
+            reduce_function (str): Function used in reduces expression
             alert_expression (str): The expression used to define the alert condition.
             alert_msg (str): The summary message for the alert.
             labels (dict): The labels associated with the alert rule.
@@ -101,6 +102,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
         rule = {
             "title": title,
             "metric": metric,
+            "reduce_function": reduce_function,
             "alert_expression": alert_expression,
             "annotations": {
                 "summary": alert_msg
@@ -128,7 +130,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
                     triggers=[
                         CloudwatchMetricsTarget(
                             refId='QUERY',
-                            namespace=self.metric_namespace,
+                            namespace=alert["metric"]["namespace"] or self.metric_namespace,
                             metricName=alert["metric"]["name"],
                             statistics=alert["metric"]["statistics"],
                             dimensions=alert["metric"]["dimensions"],
@@ -138,7 +140,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
                             refId="REDUCE_EXPRESSION",
                             expressionType=EXP_TYPE_REDUCE,
                             expression='QUERY',
-                            reduceFunction=EXP_REDUCER_FUNC_LAST,
+                            reduceFunction=alert["reduce_function"],
                             reduceMode=EXP_REDUCER_FUNC_DROP_NN
                         ),
                         AlertExpression(
