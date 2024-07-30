@@ -27,7 +27,6 @@ class AlertRuleBuilder(ABC):
         self.environment = environment
         self.evaluateFor = evaluateFor
         self.uid_prefix = uid_prefix
-        self.metric_namespace = metric_namespace
 
     def register(self, title, metric, alert_expression, alert_msg, labels, __panelId__):
         """
@@ -82,6 +81,10 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
     """
     A class for building CloudWatch alert rules.
     """
+
+    def __init__(self, environment, evaluateFor, uid_prefix, metric_namespace):
+        super().__init__(environment, evaluateFor, uid_prefix)
+        self.metric_namespace = metric_namespace
 
     def register(self, title, metric, alert_expression, alert_msg, labels, __panelId__):
         """
