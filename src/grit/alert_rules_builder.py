@@ -16,7 +16,7 @@ class AlertRuleBuilder(ABC):
     An interface class for building alert rules.
     """
 
-    def __init__(self, environment, evaluateFor, uid_prefix):
+    def __init__(self, environment, evaluateFor, uid_prefix, metric_namespace):
         """
         Initialize the AlertRuleBuilder.
 
@@ -27,6 +27,7 @@ class AlertRuleBuilder(ABC):
         self.environment = environment
         self.evaluateFor = evaluateFor
         self.uid_prefix = uid_prefix
+        self.metric_namespace = metric_namespace
 
     def register(self, title, metric, alert_expression, alert_msg, labels, __panelId__):
         """
@@ -58,7 +59,7 @@ class AlertRuleBuilder(ABC):
         Build the alert rules.
         """
         raise NotImplementedError("Method build() must be implemented in a subclass.")
-    
+
     @staticmethod
     def build_all(*alert_rule_builders):
         """
@@ -124,7 +125,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
                     triggers=[
                         CloudwatchMetricsTarget(
                             refId='QUERY',
-                            namespace="AWS/ES",
+                            namespace=self.metric_namespace,
                             metricName=alert["metric"]["name"],
                             statistics=alert["metric"]["statistics"],
                             dimensions=alert["metric"]["dimensions"],
@@ -149,7 +150,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
                     uid=self.uid_prefix + str(_id),
                 )
             )
-        
+
         return __alert_rules__
 
 
@@ -199,6 +200,5 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
                     uid=self.uid_prefix + str(_id),
                 )
             )
-        
-        return __alert_rules__
 
+        return __alert_rules__
