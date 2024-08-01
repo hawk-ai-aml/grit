@@ -9,6 +9,7 @@ from grafanalib.core import (
 )
 
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
+from grafanalib.prometheus_target import PrometheusTarget
 from abc import ABC, abstractmethod
 
 class AlertRuleBuilder(ABC):
@@ -198,7 +199,7 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
                 AlertRulev11(
                     title=alert["title"],
                     triggers=[
-                        Target(
+                        PrometheusTarget(
                             refId='QUERY',
                             expr=alert["metric"]["expr"],
                             legendFormat=alert["metric"]["legendFormat"],
