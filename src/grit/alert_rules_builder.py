@@ -19,7 +19,7 @@ class AlertRuleBuilder(ABC):
     An interface class for building alert rules.
     """
 
-    def __init__(self, environment, evaluateFor, uid_prefix):
+    def __init__(self, environment, evaluateFor, uid_prefix, dashboard_uid):
         """
         Initialize the AlertRuleBuilder.
 
@@ -30,6 +30,7 @@ class AlertRuleBuilder(ABC):
         self.environment = environment
         self.evaluateFor = evaluateFor
         self.uid_prefix = uid_prefix
+        self.dashboard_uid = dashboard_uid
 
     def register(self, title, metric, alert_expression, alert_msg, labels, __panelId__,
                  time_range=TimeRange('5m', 'now')):
@@ -110,8 +111,8 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
     A class for building CloudWatch alert rules.
     """
 
-    def __init__(self, environment, evaluateFor, uid_prefix, metric_namespace):
-        super().__init__(environment, evaluateFor, uid_prefix)
+    def __init__(self, environment, evaluateFor, uid_prefix, metric_namespace, dashboard_uid):
+        super().__init__(environment, evaluateFor, uid_prefix, dashboard_uid)
         self.metric_namespace = metric_namespace
 
     def register(self, title, metric, reduce_function, alert_expression, alert_msg, labels, __panelId__,
@@ -175,6 +176,8 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
                     condition="ALERT_CONDITION",
                     evaluateFor=self.evaluateFor,
                     uid=self.uid_prefix + str(_id),
+                    panel_id=alert["__panelId__"],
+                    dashboard_uid=self.dashboard_uid,
                 )
             )
 
@@ -227,6 +230,8 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
                     condition="ALERT_CONDITION",
                     evaluateFor=self.evaluateFor,
                     uid=self.uid_prefix + str(_id),
+                    panel_id=alert["__panelId__"],
+                    dashboard_uid=self.dashboard_uid,
                 )
             )
 
@@ -235,11 +240,8 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
 
 class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
     """
-    A class for building CloudWatch alert rules.
+    A class for building ElasticSearchTarget alert rules.
     """
-
-    def __init__(self, environment, evaluateFor, uid_prefix):
-        super().__init__(environment, evaluateFor, uid_prefix)
 
     def register(self, title, bucket_aggs, query, datasource, reduce_function,
                  alert_expression, alert_msg,
@@ -321,6 +323,8 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
                     condition="ALERT_CONDITION",
                     evaluateFor=self.evaluateFor,
                     uid=self.uid_prefix + str(_id),
+                    panel_id=alert["__panelId__"],
+                    dashboard_uid=self.dashboard_uid,
                 )
             )
 
