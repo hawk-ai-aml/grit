@@ -243,7 +243,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
 
     def register(self, title, bucket_aggs, query, datasource, reduce_function,
                  alert_expression, alert_msg,
-                 labels, __panelId__, metric_aggs=[CountMetricAgg()], time_range=TimeRange('5m', 'now')):
+                 labels, __panelId__, apply_auto_bucket_agg_ids_function=False, metric_aggs=[CountMetricAgg()], time_range=TimeRange('5m', 'now')):
         """
         Register a new alert rule.
 
@@ -270,6 +270,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
                 "summary": alert_msg
             },
             "labels": labels,
+            "apply_auto_bucket_function": apply_auto_bucket_agg_ids_function,
             "__panelId__": __panelId__
         }
         self.rules.append(rule)
@@ -286,17 +287,21 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
         """
         __alert_rules__ = []
         for _id, alert in enumerate(self.rules):
+            target = ElasticsearchTarget(
+                query=alert["query"],
+                bucketAggs=alert["bucket_aggs"],
+                metricAggs=alert["metric_aggs"],
+                refId='QUERY',
+                datasource=alert["datasource"]
+            )
+            if alert["apply_auto_bucket_function"]:
+                target = target.auto_bucket_agg_ids()
+
             __alert_rules__.append(
                 AlertRulev11(
                     title=alert["title"],
                     triggers=[
-                        ElasticsearchTarget(
-                            query=alert["query"],
-                            bucketAggs=alert["bucket_aggs"],
-                            metricAggs=alert["metric_aggs"],
-                            refId='QUERY',
-                            datasource=alert["datasource"]
-                        ),
+                        target,
                         AlertExpression(
                             refId="REDUCE_EXPRESSION",
                             expressionType=EXP_TYPE_REDUCE,
