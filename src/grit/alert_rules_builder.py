@@ -13,6 +13,7 @@ from grafanalib.prometheus_target import PrometheusTarget
 from grafanalib.elasticsearch import ElasticsearchTarget, DateHistogramGroupBy
 from abc import ABC, abstractmethod
 
+
 class AlertRuleBuilder(ABC):
     """
     An interface class for building alert rules.
@@ -30,7 +31,8 @@ class AlertRuleBuilder(ABC):
         self.evaluateFor = evaluateFor
         self.uid_prefix = uid_prefix
 
-    def register(self, title, metric, alert_expression, alert_msg, labels, __panelId__, time_range=TimeRange('5m', 'now')):
+    def register(self, title, metric, alert_expression, alert_msg, labels, __panelId__,
+                 time_range=TimeRange('5m', 'now')):
         """
         Register a new alert rule.
 
@@ -112,7 +114,8 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
         super().__init__(environment, evaluateFor, uid_prefix)
         self.metric_namespace = metric_namespace
 
-    def register(self, title, metric, reduce_function, alert_expression, alert_msg, labels, __panelId__, time_range=TimeRange('5m', 'now')):
+    def register(self, title, metric, reduce_function, alert_expression, alert_msg, labels, __panelId__,
+                 time_range=TimeRange('5m', 'now')):
         """
         Register a new alert rule.
 
@@ -139,9 +142,8 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
         Returns:
             list: A list of AlertRulev11 objects representing the built alert rules.
         """
-        __alert_rules__=[]
+        __alert_rules__ = []
         for _id, alert in enumerate(self.rules):
-
             __alert_rules__.append(
                 AlertRulev11(
                     title=alert["title"],
@@ -194,7 +196,7 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
         Returns:
             list: A list of AlertRulev11 objects representing the built alert rules.
         """
-        __alert_rules__=[]
+        __alert_rules__ = []
         for _id, alert in enumerate(self.rules):
             __alert_rules__.append(
                 AlertRulev11(
@@ -230,6 +232,7 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
 
         return __alert_rules__
 
+
 class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
     """
     A class for building CloudWatch alert rules.
@@ -238,7 +241,8 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
     def __init__(self, environment, evaluateFor, uid_prefix):
         super().__init__(environment, evaluateFor, uid_prefix)
 
-    def register(self, title, bucket_aggs, metric_aggs, datasource, reduce_function, alert_expression, alert_msg, labels, __panelId__, time_range=TimeRange('5m', 'now')):
+    def register(self, title, bucket_aggs, metric_aggs, query, datasource, reduce_function, alert_expression, alert_msg,
+                 labels, __panelId__, time_range=TimeRange('5m', 'now')):
         """
         Register a new alert rule.
 
@@ -254,6 +258,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
         """
         rule = {
             "title": title,
+            "query": query,
             "bucket_aggs": bucket_aggs,
             "metric_aggs": metric_aggs,
             "datasource": datasource,
@@ -277,9 +282,8 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
         Returns:
             list: A list of AlertRulev11 objects representing the built alert rules.
         """
-        __alert_rules__=[]
+        __alert_rules__ = []
         for _id, alert in enumerate(self.rules):
-
             __alert_rules__.append(
                 AlertRulev11(
                     title=alert["title"],
