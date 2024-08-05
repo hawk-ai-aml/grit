@@ -262,6 +262,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
             "bucket_aggs": bucket_aggs,
             "metric_aggs": metric_aggs,
             "datasource": datasource,
+            "reduce_function": reduce_function,
             "alert_expression": alert_expression,
             "time_range": time_range,
             "annotations": {
