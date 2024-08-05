@@ -10,7 +10,7 @@ from grafanalib.core import (
 
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.prometheus_target import PrometheusTarget
-from grafanalib.elasticsearch import ElasticsearchTarget, DateHistogramGroupBy
+from grafanalib.elasticsearch import (ElasticsearchTarget, DateHistogramGroupBy, CountMetricAgg)
 from abc import ABC, abstractmethod
 
 
@@ -241,7 +241,8 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
     def __init__(self, environment, evaluateFor, uid_prefix):
         super().__init__(environment, evaluateFor, uid_prefix)
 
-    def register(self, title, bucket_aggs, metric_aggs, query, datasource, reduce_function, alert_expression, alert_msg,
+    def register(self, title, bucket_aggs, metric_aggs=[CountMetricAgg()], query, datasource, reduce_function,
+                 alert_expression, alert_msg,
                  labels, __panelId__, time_range=TimeRange('5m', 'now')):
         """
         Register a new alert rule.
