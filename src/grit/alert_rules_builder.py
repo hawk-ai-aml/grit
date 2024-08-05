@@ -241,9 +241,9 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
     def __init__(self, environment, evaluateFor, uid_prefix):
         super().__init__(environment, evaluateFor, uid_prefix)
 
-    def register(self, title, bucket_aggs, metric_aggs=[CountMetricAgg()], query, datasource, reduce_function,
+    def register(self, title, bucket_aggs, query, datasource, reduce_function,
                  alert_expression, alert_msg,
-                 labels, __panelId__, time_range=TimeRange('5m', 'now')):
+                 labels, __panelId__, metric_aggs=[CountMetricAgg()], time_range=TimeRange('5m', 'now')):
         """
         Register a new alert rule.
 
