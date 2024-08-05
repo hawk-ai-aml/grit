@@ -51,7 +51,9 @@ class AlertRuleBuilder(ABC):
             "alert_expression": alert_expression,
             "time_range": time_range,
             "annotations": {
-                "summary": alert_msg
+                "summary": alert_msg,
+                "__panelId__": __panelId__,
+                "__dashboardUid__": self.dashboard_uid
             },
             "labels": labels,
             "__panelId__": __panelId__
@@ -269,7 +271,9 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
             "alert_expression": alert_expression,
             "time_range": time_range,
             "annotations": {
-                "summary": alert_msg
+                "summary": alert_msg,
+                "__panelId__": __panelId__,
+                "__dashboardUid__": self.dashboard_uid
             },
             "labels": labels,
             "apply_auto_bucket_function": apply_auto_bucket_agg_ids_function,
