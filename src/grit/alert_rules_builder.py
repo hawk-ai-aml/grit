@@ -51,13 +51,15 @@ class AlertRuleBuilder(ABC):
             "alert_expression": alert_expression,
             "time_range": time_range,
             "annotations": {
-                "summary": alert_msg,
-                "__panelId__": __panelId__,
-                "__dashboardUid__": self.dashboard_uid
+                "summary": alert_msg
             },
             "labels": labels,
             "__panelId__": __panelId__
         }
+        if self.dashboard_uid != "":
+            rule["annotations"]["__panelId__"] = __panelId__
+            rule["annotations"]["__dashboardUid__"] = self.dashboard_uid
+
         self.rules.append(rule)
 
     @abstractmethod
@@ -271,14 +273,17 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
             "alert_expression": alert_expression,
             "time_range": time_range,
             "annotations": {
-                "summary": alert_msg,
-                "__panelId__": __panelId__,
-                "__dashboardUid__": self.dashboard_uid
+                "summary": alert_msg
             },
             "labels": labels,
             "apply_auto_bucket_function": apply_auto_bucket_agg_ids_function,
             "__panelId__": __panelId__
         }
+
+        if self.dashboard_uid != "":
+            rule["annotations"]["__panelId__"] = __panelId__
+            rule["annotations"]["__dashboardUid__"] = self.dashboard_uid
+
         self.rules.append(rule)
 
     def build(self):
