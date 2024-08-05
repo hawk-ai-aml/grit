@@ -10,6 +10,7 @@ from grafanalib.core import (
 
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.prometheus_target import PrometheusTarget
+from grafanalib.elasticsearch import ElasticsearchTarget, DateHistogramGroupBy
 from abc import ABC, abstractmethod
 
 class AlertRuleBuilder(ABC):
@@ -210,6 +211,91 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
                             expressionType=EXP_TYPE_REDUCE,
                             expression='QUERY',
                             reduceFunction=EXP_REDUCER_FUNC_LAST,
+                            reduceMode=EXP_REDUCER_FUNC_DROP_NN
+                        ),
+                        AlertExpression(
+                            refId="ALERT_CONDITION",
+                            expressionType=EXP_TYPE_MATH,
+                            expression=alert["alert_expression"],
+                        )],
+                    timeRangeFrom=self.convert_time_range_to_number(alert["time_range"].to_json_data()[0]),
+                    timeRangeTo=self.convert_time_range_to_number(alert["time_range"].to_json_data()[1]),
+                    annotations=alert["annotations"],
+                    labels=alert["labels"],
+                    condition="ALERT_CONDITION",
+                    evaluateFor=self.evaluateFor,
+                    uid=self.uid_prefix + str(_id),
+                )
+            )
+
+        return __alert_rules__
+
+class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
+    """
+    A class for building CloudWatch alert rules.
+    """
+
+    def __init__(self, environment, evaluateFor, uid_prefix):
+        super().__init__(environment, evaluateFor, uid_prefix)
+
+    def register(self, title, bucket_aggs, metric_aggs, datasource, reduce_function, alert_expression, alert_msg, labels, __panelId__, time_range=TimeRange('5m', 'now')):
+        """
+        Register a new alert rule.
+
+        Args:
+            title (str): The title of the alert rule.
+            metric (dict): The metric configuration for the alert rule.
+            reduce_function (str): Function used in reduces expression
+            alert_expression (str): The expression used to define the alert condition.
+            alert_msg (str): The summary message for the alert.
+            labels (dict): The labels associated with the alert rule.
+            __panelId__ (str): The panel ID associated with the alert rule.
+            time_range (TimeRange): The time range for the alert rule. Default is '5m' to 'now'.
+        """
+        rule = {
+            "title": title,
+            "bucket_aggs": bucket_aggs,
+            "metric_aggs": metric_aggs,
+            "datasource": datasource,
+            "alert_expression": alert_expression,
+            "time_range": time_range,
+            "annotations": {
+                "summary": alert_msg
+            },
+            "labels": labels,
+            "__panelId__": __panelId__
+        }
+        self.rules.append(rule)
+
+    def build(self):
+        """
+        Build the CloudWatch alert rules.
+
+        Args:
+            uid_prefix (str): The prefix to be added to the UID of each alert rule.
+
+        Returns:
+            list: A list of AlertRulev11 objects representing the built alert rules.
+        """
+        __alert_rules__=[]
+        for _id, alert in enumerate(self.rules):
+
+            __alert_rules__.append(
+                AlertRulev11(
+                    title=alert["title"],
+                    triggers=[
+                        ElasticsearchTarget(
+                            query=alert["query"],
+                            bucketAggs=alert["bucket_aggs"],
+                            metricAggs=alert["metric_aggs"],
+                            refId='QUERY',
+                            datasource=alert["datasource"]
+                        ),
+                        AlertExpression(
+                            refId="REDUCE_EXPRESSION",
+                            expressionType=EXP_TYPE_REDUCE,
+                            expression='QUERY',
+                            reduceFunction=alert["reduce_function"],
                             reduceMode=EXP_REDUCER_FUNC_DROP_NN
                         ),
                         AlertExpression(
