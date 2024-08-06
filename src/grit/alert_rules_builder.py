@@ -57,7 +57,7 @@ class AlertRuleBuilder(ABC):
             "panelId": panelId
         }
         if self.dashboard_uid != "":
-            rule["annotations"]["panelId"] = panelId
+            rule["annotations"]["__panelId__"] = panelId
             rule["annotations"]["__dashboardUid__"] = self.dashboard_uid
 
         self.rules.append(rule)
@@ -282,7 +282,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
         }
 
         if self.dashboard_uid != "":
-            rule["annotations"]["panelId"] = panelId
+            rule["annotations"]["__panelId__"] = panelId
             rule["annotations"]["__dashboardUid__"] = self.dashboard_uid
 
         self.rules.append(rule)
