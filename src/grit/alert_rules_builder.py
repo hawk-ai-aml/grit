@@ -32,7 +32,7 @@ class AlertRuleBuilder(ABC):
         self.uid_prefix = uid_prefix
         self.dashboard_uid = dashboard_uid
 
-    def register(self, title, metric, alert_expression, alert_msg, labels, __panelId__,
+    def register(self, title, metric, alert_expression, alert_msg, labels, panelId,
                  time_range=TimeRange('5m', 'now')):
         """
         Register a new alert rule.
@@ -43,7 +43,7 @@ class AlertRuleBuilder(ABC):
             alert_expression (str): The expression used to define the alert condition.
             alert_msg (str): The summary message for the alert.
             labels (dict): The labels associated with the alert rule.
-            __panelId__ (str): The panel ID associated with the alert rule.
+            panelId (str): The panel ID associated with the alert rule.
         """
         rule = {
             "title": title,
@@ -54,10 +54,10 @@ class AlertRuleBuilder(ABC):
                 "summary": alert_msg
             },
             "labels": labels,
-            "__panelId__": __panelId__
+            "panelId": panelId
         }
         if self.dashboard_uid != "":
-            rule["annotations"]["__panelId__"] = __panelId__
+            rule["annotations"]["panelId"] = panelId
             rule["annotations"]["__dashboardUid__"] = self.dashboard_uid
 
         self.rules.append(rule)
@@ -119,7 +119,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
         super().__init__(environment, evaluateFor, uid_prefix, dashboard_uid)
         self.metric_namespace = metric_namespace
 
-    def register(self, title, metric, reduce_function, alert_expression, alert_msg, labels, __panelId__,
+    def register(self, title, metric, reduce_function, alert_expression, alert_msg, labels, panelId,
                  time_range=TimeRange('5m', 'now')):
         """
         Register a new alert rule.
@@ -131,10 +131,10 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
             alert_expression (str): The expression used to define the alert condition.
             alert_msg (str): The summary message for the alert.
             labels (dict): The labels associated with the alert rule.
-            __panelId__ (str): The panel ID associated with the alert rule.
+            panelId (str): The panel ID associated with the alert rule.
             time_range (TimeRange): The time range for the alert rule. Default is '5m' to 'now'.
         """
-        super().register(title, metric, alert_expression, alert_msg, labels, __panelId__, time_range)
+        super().register(title, metric, alert_expression, alert_msg, labels, panelId, time_range)
         self.rules[-1]["reduce_function"] = reduce_function
 
     def build(self):
@@ -180,7 +180,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
                     condition="ALERT_CONDITION",
                     evaluateFor=self.evaluateFor,
                     uid=self.uid_prefix + str(_id),
-                    panel_id=alert["__panelId__"],
+                    panel_id=alert["panelId"],
                     dashboard_uid=self.dashboard_uid,
                 )
             )
@@ -234,7 +234,7 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
                     condition="ALERT_CONDITION",
                     evaluateFor=self.evaluateFor,
                     uid=self.uid_prefix + str(_id),
-                    panel_id=alert["__panelId__"],
+                    panel_id=alert["panelId"],
                     dashboard_uid=self.dashboard_uid,
                 )
             )
@@ -249,7 +249,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
 
     def register(self, title, bucket_aggs, query, datasource, reduce_function,
                  alert_expression, alert_msg,
-                 labels, __panelId__, apply_auto_bucket_agg_ids_function=False, metric_aggs=[CountMetricAgg()], time_range=TimeRange('5m', 'now')):
+                 labels, panelId, interval_ms=1000, apply_auto_bucket_agg_ids_function=False, metric_aggs=[CountMetricAgg()], time_range=TimeRange('5m', 'now')):
         """
         Register a new alert rule.
 
@@ -260,7 +260,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
             alert_expression (str): The expression used to define the alert condition.
             alert_msg (str): The summary message for the alert.
             labels (dict): The labels associated with the alert rule.
-            __panelId__ (str): The panel ID associated with the alert rule.
+            panelId (str): The panel ID associated with the alert rule.
             time_range (TimeRange): The time range for the alert rule. Default is '5m' to 'now'.
         """
         rule = {
@@ -268,6 +268,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
             "query": query,
             "bucket_aggs": bucket_aggs,
             "metric_aggs": metric_aggs,
+            "interval_ms": interval_ms,
             "datasource": datasource,
             "reduce_function": reduce_function,
             "alert_expression": alert_expression,
@@ -277,11 +278,11 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
             },
             "labels": labels,
             "apply_auto_bucket_function": apply_auto_bucket_agg_ids_function,
-            "__panelId__": __panelId__
+            "panelId": panelId
         }
 
         if self.dashboard_uid != "":
-            rule["annotations"]["__panelId__"] = __panelId__
+            rule["annotations"]["panelId"] = panelId
             rule["annotations"]["__dashboardUid__"] = self.dashboard_uid
 
         self.rules.append(rule)
@@ -302,6 +303,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
                 query=alert["query"],
                 bucketAggs=alert["bucket_aggs"],
                 metricAggs=alert["metric_aggs"],
+                intervalMs=alert["interval_ms"],
                 refId='QUERY',
                 datasource=alert["datasource"]
             )
@@ -332,7 +334,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
                     condition="ALERT_CONDITION",
                     evaluateFor=self.evaluateFor,
                     uid=self.uid_prefix + str(_id),
-                    panel_id=alert["__panelId__"],
+                    panel_id=alert["panelId"],
                     dashboard_uid=self.dashboard_uid,
                 )
             )
