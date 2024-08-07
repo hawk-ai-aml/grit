@@ -91,13 +91,24 @@ class AlertRuleBuilder(ABC):
         Convert time range to seconds.
 
         Args:
-            time_range (str): Time range in format '1h', '2d', '3w', etc.
+            time_range (str): Time range in format '1h', '2d', '3w', 'now', 'now-15m', etc.
 
         Returns:
             int: Time range in seconds.
         """
         if time_range == 'now':
             return 0
+        elif time_range.startswith('now-'):
+            if time_range.endswith('m'):
+                return int(time_range[4:-1]) * 60
+            elif time_range.endswith('h'):
+                return int(time_range[4:-1]) * 3600
+            elif time_range.endswith('d'):
+                return int(time_range[4:-1]) * 86400
+            elif time_range.endswith('w'):
+                return int(time_range[4:-1]) * 604800
+            else:
+                return 0
         elif time_range[-1] == 'm':
             return int(time_range[:-1]) * 60
         elif time_range[-1] == 'h':
