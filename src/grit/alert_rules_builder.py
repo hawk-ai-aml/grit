@@ -33,7 +33,7 @@ class AlertRuleBuilder(ABC):
         self.dashboard_uid = dashboard_uid
 
     def register(self, title, metric, alert_expression, alert_msg, labels, panelId,
-                 time_range=TimeRange('5m', 'now')):
+                 reduce_function=EXP_REDUCER_FUNC_LAST, time_range=TimeRange('5m', 'now')):
         """
         Register a new alert rule.
 
@@ -48,13 +48,14 @@ class AlertRuleBuilder(ABC):
         rule = {
             "title": title,
             "metric": metric,
+            "reduce_function": reduce_function,
             "alert_expression": alert_expression,
             "time_range": time_range,
             "annotations": {
                 "summary": alert_msg
             },
             "labels": labels,
-            "panelId": panelId
+            "panelId": panelId,
         }
         if self.dashboard_uid != "":
             rule["annotations"]["__panelId__"] = panelId
@@ -129,24 +130,6 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
     def __init__(self, environment, evaluateFor, uid_prefix, metric_namespace, dashboard_uid):
         super().__init__(environment, evaluateFor, uid_prefix, dashboard_uid)
         self.metric_namespace = metric_namespace
-
-    def register(self, title, metric, reduce_function, alert_expression, alert_msg, labels, panelId,
-                 time_range=TimeRange('5m', 'now')):
-        """
-        Register a new alert rule.
-
-        Args:
-            title (str): The title of the alert rule.
-            metric (dict): The metric configuration for the alert rule.
-            reduce_function (str): Function used in reduces expression
-            alert_expression (str): The expression used to define the alert condition.
-            alert_msg (str): The summary message for the alert.
-            labels (dict): The labels associated with the alert rule.
-            panelId (str): The panel ID associated with the alert rule.
-            time_range (TimeRange): The time range for the alert rule. Default is '5m' to 'now'.
-        """
-        super().register(title, metric, alert_expression, alert_msg, labels, panelId, time_range)
-        self.rules[-1]["reduce_function"] = reduce_function
 
     def build(self):
         """
@@ -230,7 +213,7 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
                             refId="REDUCE_EXPRESSION",
                             expressionType=EXP_TYPE_REDUCE,
                             expression='QUERY',
-                            reduceFunction=EXP_REDUCER_FUNC_LAST,
+                            reduceFunction=alert["reduce_function"],
                             reduceMode=EXP_REDUCER_FUNC_DROP_NN
                         ),
                         AlertExpression(
@@ -260,7 +243,8 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
 
     def register(self, title, bucket_aggs, query, datasource, reduce_function,
                  alert_expression, alert_msg,
-                 labels, panelId, interval_ms=1000, apply_auto_bucket_agg_ids_function=False, metric_aggs=[CountMetricAgg()], time_range=TimeRange('5m', 'now')):
+                 labels, panelId, interval_ms=1000, apply_auto_bucket_agg_ids_function=False,
+                 metric_aggs=[CountMetricAgg()], time_range=TimeRange('5m', 'now')):
         """
         Register a new alert rule.
 
