@@ -251,7 +251,8 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
     def register(self, title, bucket_aggs, query, datasource, reduce_function,
                  alert_expression, alert_msg,
                  labels, panelId, interval_ms=1000, apply_auto_bucket_agg_ids_function=False,
-                 metric_aggs=[CountMetricAgg()], time_range=TimeRange('5m', 'now')):
+                 metric_aggs=[CountMetricAgg()], time_range=TimeRange('5m', 'now'),
+                 no_data_alert_state=ALERTRULE_STATE_DATA_NODATA, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
         """
         Register a new alert rule.
 
@@ -280,7 +281,9 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
             },
             "labels": labels,
             "apply_auto_bucket_function": apply_auto_bucket_agg_ids_function,
-            "panelId": panelId
+            "panelId": panelId,
+            "no_data_alert_state": no_data_alert_state,
+            "execute_error_alert_state": execute_error_alert_state
         }
 
         if self.dashboard_uid != "":
