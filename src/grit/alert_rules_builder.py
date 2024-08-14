@@ -5,7 +5,7 @@ import grafanalib.core
 from grafanalib.core import (
     AlertExpression,
     EXP_TYPE_REDUCE, EXP_TYPE_MATH, EXP_REDUCER_FUNC_DROP_NN, EXP_REDUCER_FUNC_LAST, CTYPE_QUERY,
-    AlertRulev11, Target, TimeRange
+    AlertRulev11, Target, TimeRange, ALERTRULE_STATE_DATA_ALERTING, ALERTRULE_STATE_DATA_NODATA
 )
 
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
@@ -33,7 +33,8 @@ class AlertRuleBuilder(ABC):
         self.dashboard_uid = dashboard_uid
 
     def register(self, title, metric, alert_expression, alert_msg, labels, panelId,
-                 reduce_function=EXP_REDUCER_FUNC_LAST, time_range=TimeRange('5m', 'now')):
+                 reduce_function=EXP_REDUCER_FUNC_LAST, time_range=TimeRange('5m', 'now'),
+                 no_data_alert_state=ALERTRULE_STATE_DATA_NODATA, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
         """
         Register a new alert rule.
 
@@ -56,6 +57,8 @@ class AlertRuleBuilder(ABC):
             },
             "labels": labels,
             "panelId": panelId,
+            "no_data_alert_state": no_data_alert_state,
+            "execute_error_alert_state": execute_error_alert_state
         }
         if self.dashboard_uid != "":
             rule["annotations"]["__panelId__"] = panelId
@@ -172,6 +175,8 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
                     annotations=alert["annotations"],
                     labels=alert["labels"],
                     condition="ALERT_CONDITION",
+                    no_data_alert_state=alert["no_data_alert_state"],
+                    execute_error_alert_state=alert["execute_error_alert_state"],
                     evaluateFor=self.evaluateFor,
                     uid=self.uid_prefix + str(_id),
                     panel_id=alert["panelId"],
@@ -226,6 +231,8 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
                     annotations=alert["annotations"],
                     labels=alert["labels"],
                     condition="ALERT_CONDITION",
+                    no_data_alert_state=alert["no_data_alert_state"],
+                    execute_error_alert_state=alert["execute_error_alert_state"],
                     evaluateFor=self.evaluateFor,
                     uid=self.uid_prefix + str(_id),
                     panel_id=alert["panelId"],
@@ -327,6 +334,8 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
                     annotations=alert["annotations"],
                     labels=alert["labels"],
                     condition="ALERT_CONDITION",
+                    no_data_alert_state=alert["no_data_alert_state"],
+                    execute_error_alert_state=alert["execute_error_alert_state"],
                     evaluateFor=self.evaluateFor,
                     uid=self.uid_prefix + str(_id),
                     panel_id=alert["panelId"],
