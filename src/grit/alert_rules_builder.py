@@ -90,7 +90,7 @@ class AlertRuleBuilder(ABC):
             __alert_rules__.extend(builder.build())
         return __alert_rules__
 
-    def convert_time_range_to_number(self, time_range):
+    def _convert_time_range_to_number(self, time_range):
         """
         Convert time range to seconds.
 
@@ -170,8 +170,8 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
                             expressionType=EXP_TYPE_MATH,
                             expression=alert["alert_expression"],
                         )],
-                    timeRangeFrom=self.convert_time_range_to_number(alert["time_range"].to_json_data()[0]),
-                    timeRangeTo=self.convert_time_range_to_number(alert["time_range"].to_json_data()[1]),
+                    timeRangeFrom=self._convert_time_range_to_number(alert["time_range"].to_json_data()[0]),
+                    timeRangeTo=self._convert_time_range_to_number(alert["time_range"].to_json_data()[1]),
                     annotations=alert["annotations"],
                     labels=alert["labels"],
                     condition="ALERT_CONDITION",
@@ -207,27 +207,9 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
             __alert_rules__.append(
                 AlertRulev11(
                     title=alert["title"],
-                    triggers=[
-                        PrometheusTarget(
-                            refId='QUERY',
-                            expr=alert["metric"]["expr"],
-                            legendFormat=alert["metric"]["legendFormat"],
-                            datasource="prometheus"
-                        ),
-                        AlertExpression(
-                            refId="REDUCE_EXPRESSION",
-                            expressionType=EXP_TYPE_REDUCE,
-                            expression='QUERY',
-                            reduceFunction=alert["reduce_function"],
-                            reduceMode=EXP_REDUCER_FUNC_DROP_NN
-                        ),
-                        AlertExpression(
-                            refId="ALERT_CONDITION",
-                            expressionType=EXP_TYPE_MATH,
-                            expression=alert["alert_expression"],
-                        )],
-                    timeRangeFrom=self.convert_time_range_to_number(alert["time_range"].to_json_data()[0]),
-                    timeRangeTo=self.convert_time_range_to_number(alert["time_range"].to_json_data()[1]),
+                    triggers=self._generate_triggers(alert),
+                    timeRangeFrom=self._convert_time_range_to_number(alert["time_range"].to_json_data()[0]),
+                    timeRangeTo=self._convert_time_range_to_number(alert["time_range"].to_json_data()[1]),
                     annotations=alert["annotations"],
                     labels=alert["labels"],
                     condition="ALERT_CONDITION",
@@ -242,6 +224,55 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
 
         return __alert_rules__
 
+    def _generate_triggers(self, alert):
+
+        if isinstance(alert["metric"], list):
+            triggers=[]
+            for alert_metric in alert["metric"]:
+                triggers.append(
+                    PrometheusTarget(
+                        refId=alert_metric["refId"]+"-QUERY",
+                        expr=alert_metric["expr"],
+                        legendFormat=alert_metric["legendFormat"],
+                        datasource="prometheus"
+                    ))
+
+                triggers.append(
+                        AlertExpression(
+                            refId=alert_metric["refId"],
+                            expressionType=EXP_TYPE_REDUCE,
+                            expression=alert_metric["refId"]+"-QUERY",
+                            reduceFunction=alert["reduce_function"],
+                            reduceMode=EXP_REDUCER_FUNC_DROP_NN
+                        ))
+
+            triggers.append(
+                AlertExpression(
+                refId="ALERT_CONDITION",
+                expressionType=EXP_TYPE_MATH,
+                expression=alert["alert_expression"],
+            ))
+
+        return [
+            PrometheusTarget(
+                refId='QUERY',
+                expr=alert["metric"]["expr"],
+                legendFormat=alert["metric"]["legendFormat"],
+                datasource="prometheus"
+            ),
+            AlertExpression(
+                refId="REDUCE_EXPRESSION",
+                expressionType=EXP_TYPE_REDUCE,
+                expression='QUERY',
+                reduceFunction=alert["reduce_function"],
+                reduceMode=EXP_REDUCER_FUNC_DROP_NN
+            ),
+            AlertExpression(
+                refId="ALERT_CONDITION",
+                expressionType=EXP_TYPE_MATH,
+                expression=alert["alert_expression"],
+            )
+        ],
 
 class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
     """
@@ -332,8 +363,8 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
                             expressionType=EXP_TYPE_MATH,
                             expression=alert["alert_expression"],
                         )],
-                    timeRangeFrom=self.convert_time_range_to_number(alert["time_range"].to_json_data()[0]),
-                    timeRangeTo=self.convert_time_range_to_number(alert["time_range"].to_json_data()[1]),
+                    timeRangeFrom=self._convert_time_range_to_number(alert["time_range"].to_json_data()[0]),
+                    timeRangeTo=self._convert_time_range_to_number(alert["time_range"].to_json_data()[1]),
                     annotations=alert["annotations"],
                     labels=alert["labels"],
                     condition="ALERT_CONDITION",
