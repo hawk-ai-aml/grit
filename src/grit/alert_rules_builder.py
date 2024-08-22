@@ -253,6 +253,8 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
                 expression=alert["alert_expression"],
             ))
 
+            return triggers
+
         return [
             PrometheusTarget(
                 refId='QUERY',
@@ -272,7 +274,7 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
                 expressionType=EXP_TYPE_MATH,
                 expression=alert["alert_expression"],
             )
-        ],
+        ]
 
 class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
     """
