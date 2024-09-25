@@ -158,6 +158,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
                             dimensions=alert["metric"]["dimensions"],
                             datasource="cloudwatch",
                             matchExact=alert["metric"].get("matchExact", True),
+                            region=alert["metric"].get("region", "default"),
                         ),
                         AlertExpression(
                             refId="REDUCE_EXPRESSION",
