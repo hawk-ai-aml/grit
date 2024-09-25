@@ -156,7 +156,8 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
                             metricName=alert["metric"]["name"],
                             statistics=alert["metric"]["statistics"],
                             dimensions=alert["metric"]["dimensions"],
-                            datasource="cloudwatch"
+                            datasource="cloudwatch",
+                            matchExact=alert["metric"].get("matchExact", True),
                         ),
                         AlertExpression(
                             refId="REDUCE_EXPRESSION",
