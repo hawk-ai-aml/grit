@@ -149,29 +149,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
             __alert_rules__.append(
                 AlertRulev11(
                     title=alert["title"],
-                    triggers=[
-                        CloudwatchMetricsTarget(
-                            refId='QUERY',
-                            namespace=alert["metric"].get("namespace", self.metric_namespace),
-                            metricName=alert["metric"]["name"],
-                            statistics=alert["metric"]["statistics"],
-                            dimensions=alert["metric"]["dimensions"],
-                            datasource="cloudwatch",
-                            matchExact=alert["metric"].get("matchExact", True),
-                            region=alert["metric"].get("region", "default"),
-                        ),
-                        AlertExpression(
-                            refId="REDUCE_EXPRESSION",
-                            expressionType=EXP_TYPE_REDUCE,
-                            expression='QUERY',
-                            reduceFunction=alert["reduce_function"],
-                            reduceMode=EXP_REDUCER_FUNC_DROP_NN
-                        ),
-                        AlertExpression(
-                            refId="ALERT_CONDITION",
-                            expressionType=EXP_TYPE_MATH,
-                            expression=alert["alert_expression"],
-                        )],
+                    triggers=self._generate_triggers(alert),
                     timeRangeFrom=self._convert_time_range_to_number(alert["time_range"].to_json_data()[0]),
                     timeRangeTo=self._convert_time_range_to_number(alert["time_range"].to_json_data()[1]),
                     annotations=alert["annotations"],
@@ -188,6 +166,65 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
 
         return __alert_rules__
 
+    def _generate_triggers(self, alert):
+
+        if isinstance(alert["metric"], list):
+            triggers=[]
+            for alert_metric in alert["metric"]:
+                triggers.append(
+                    CloudwatchMetricsTarget(
+                        refId=alert_metric["refId"]+"-QUERY",
+                        namespace=alert_metric.get("namespace", self.metric_namespace),
+                        metricName=alert_metric["name"],
+                        statistics=alert_metric["statistics"],
+                        dimensions=alert_metric["dimensions"],
+                        datasource="cloudwatch",
+                        matchExact=alert_metric.get("matchExact", True),
+                        region=alert_metric.get("region", "default"),
+                    ))
+
+                triggers.append(
+                        AlertExpression(
+                            refId=alert_metric["refId"],
+                            expressionType=EXP_TYPE_REDUCE,
+                            expression=alert_metric["refId"]+"-QUERY",
+                            reduceFunction=alert["reduce_function"],
+                            reduceMode=EXP_REDUCER_FUNC_DROP_NN
+                        ))
+
+            triggers.append(
+                AlertExpression(
+                refId="ALERT_CONDITION",
+                expressionType=EXP_TYPE_MATH,
+                expression=alert["alert_expression"],
+            ))
+
+            return triggers
+
+        return [
+            CloudwatchMetricsTarget(
+                refId='QUERY',
+                namespace=alert["metric"].get("namespace", self.metric_namespace),
+                metricName=alert["metric"]["name"],
+                statistics=alert["metric"]["statistics"],
+                dimensions=alert["metric"]["dimensions"],
+                datasource="cloudwatch",
+                matchExact=alert["metric"].get("matchExact", True),
+                region=alert["metric"].get("region", "default"),
+            ),
+            AlertExpression(
+                refId="REDUCE_EXPRESSION",
+                expressionType=EXP_TYPE_REDUCE,
+                expression='QUERY',
+                reduceFunction=alert["reduce_function"],
+                reduceMode=EXP_REDUCER_FUNC_DROP_NN
+            ),
+            AlertExpression(
+                refId="ALERT_CONDITION",
+                expressionType=EXP_TYPE_MATH,
+                expression=alert["alert_expression"],
+            )
+        ]
 
 class PrometheusAlertRuleBuilder(AlertRuleBuilder):
     """
