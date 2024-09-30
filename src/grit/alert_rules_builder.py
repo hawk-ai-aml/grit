@@ -145,6 +145,10 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
             list: A list of AlertRulev11 objects representing the built alert rules.
         """
         __alert_rules__ = []
+
+        if "aws" not in self.environment.provider:
+            return __alert_rules__
+
         for _id, alert in enumerate(self.rules):
             __alert_rules__.append(
                 AlertRulev11(
