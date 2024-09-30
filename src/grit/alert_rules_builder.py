@@ -354,7 +354,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
             "time_range": time_range,
             "annotations": {
                 "summary": alert_msg,
-                "status": '{{- with $values -}}{{- $lastValue := "" -}}{{- $lastInstance := "" -}}{{- range $k, $v := . -}}{{- $lastValue = $v -}}{{- $lastInstance = $v.Labels -}}{{ end }}Instance: {{ $lastInstance }}*Value:   {{ $lastValue }}{{- end -}}',
+                "status": '{{- with $values -}}{{- $lastValue := "" -}}{{- $lastInstance := "" -}}{{- range $k, $v := . -}}{{- $lastValue = $v -}}{{- $lastInstance = $v.Labels -}}{{- end -}}\nInstance: {{ $lastInstance }} | Value:   {{ $lastValue }}{{- end -}}',
             },
             "labels": labels,
             "apply_auto_bucket_function": apply_auto_bucket_agg_ids_function,
