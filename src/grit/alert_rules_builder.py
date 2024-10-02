@@ -19,7 +19,7 @@ class AlertRuleBuilder(ABC):
     An interface class for building alert rules.
     """
 
-    def __init__(self, environment, evaluateFor, uid_prefix, dashboard_uid):
+    def __init__(self, environment, evaluateFor, uid_prefix, dashboard_uid, datasource=None):
         """
         Initialize the AlertRuleBuilder.
 
@@ -31,6 +31,8 @@ class AlertRuleBuilder(ABC):
         self.evaluateFor = evaluateFor
         self.uid_prefix = uid_prefix
         self.dashboard_uid = dashboard_uid
+
+        self.datasource = datasource
 
     def register(self, title, metric, alert_expression, alert_msg, labels, panelId,
                  reduce_function=EXP_REDUCER_FUNC_LAST, time_range=TimeRange('5m', 'now'),
@@ -182,7 +184,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
                         metricName=alert_metric["name"],
                         statistics=alert_metric["statistics"],
                         dimensions=alert_metric["dimensions"],
-                        datasource="cloudwatch",
+                        datasource=self.datasource if self.datasource else "cloudwatch",
                         matchExact=alert_metric.get("matchExact", True),
                         region=alert_metric.get("region", "default"),
                     ))
@@ -212,7 +214,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
                 metricName=alert["metric"]["name"],
                 statistics=alert["metric"]["statistics"],
                 dimensions=alert["metric"]["dimensions"],
-                datasource="cloudwatch",
+                datasource=self.datasource if self.datasource else "cloudwatch",
                 matchExact=alert["metric"].get("matchExact", True),
                 region=alert["metric"].get("region", "default"),
             ),
@@ -277,7 +279,7 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
                         refId=alert_metric["refId"]+"-QUERY",
                         expr=alert_metric["expr"],
                         legendFormat=alert_metric["legendFormat"],
-                        datasource="prometheus"
+                        datasource=self.datasource if self.datasource else "prometheus",
                     ))
 
                 triggers.append(
@@ -303,7 +305,7 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
                 refId='QUERY',
                 expr=alert["metric"]["expr"],
                 legendFormat=alert["metric"]["legendFormat"],
-                datasource="prometheus"
+                datasource=self.datasource if self.datasource else "prometheus",
             ),
             AlertExpression(
                 refId="REDUCE_EXPRESSION",
