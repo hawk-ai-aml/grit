@@ -10,7 +10,7 @@ from grafanalib.core import (
 
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.prometheus_target import PrometheusTarget
-from grafanalib.elasticsearch import (ElasticsearchTarget, DateHistogramGroupBy, CountMetricAgg)
+from grafanalib.elasticsearch import (ElasticsearchTarget, CountMetricAgg)
 from abc import ABC, abstractmethod
 
 
@@ -19,7 +19,7 @@ class AlertRuleBuilder(ABC):
     An interface class for building alert rules.
     """
 
-    def __init__(self, environment, evaluateFor, uid_prefix, dashboard_uid, datasource=None):
+    def __init__(self, environment, evaluateFor, dashboard_uid, datasource=None, uid_prefix=""):
         """
         Initialize the AlertRuleBuilder.
 
@@ -29,7 +29,6 @@ class AlertRuleBuilder(ABC):
         self.rules = []
         self.environment = environment
         self.evaluateFor = evaluateFor
-        self.uid_prefix = uid_prefix
         self.dashboard_uid = dashboard_uid
 
         self.datasource = datasource
@@ -133,7 +132,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
     """
 
     def __init__(self, environment, evaluateFor, uid_prefix, metric_namespace, dashboard_uid):
-        super().__init__(environment, evaluateFor, uid_prefix, dashboard_uid)
+        super().__init__(environment, evaluateFor, dashboard_uid)
         self.metric_namespace = metric_namespace
 
     def build(self):
@@ -151,7 +150,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
         if "aws" not in self.environment.provider:
             return __alert_rules__
 
-        for _id, alert in enumerate(self.rules):
+        for _, alert in enumerate(self.rules):
             __alert_rules__.append(
                 AlertRulev11(
                     title=alert["title"],
@@ -248,7 +247,7 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
             list: A list of AlertRulev11 objects representing the built alert rules.
         """
         __alert_rules__ = []
-        for _id, alert in enumerate(self.rules):
+        for _, alert in enumerate(self.rules):
             __alert_rules__.append(
                 AlertRulev11(
                     title=alert["title"],
@@ -261,7 +260,7 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
                     noDataAlertState=alert["no_data_alert_state"],
                     errorAlertState=alert["execute_error_alert_state"],
                     evaluateFor=self.evaluateFor,
-                    uid=self.uid_prefix + str(_id),
+                    uid=create_uid_from_string(alert["title"]),
                     panel_id=alert["panelId"],
                     dashboard_uid=self.dashboard_uid,
                 )
@@ -382,7 +381,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
             list: A list of AlertRulev11 objects representing the built alert rules.
         """
         __alert_rules__ = []
-        for _id, alert in enumerate(self.rules):
+        for _, alert in enumerate(self.rules):
             target = ElasticsearchTarget(
                 query=alert["query"],
                 bucketAggs=alert["bucket_aggs"],
@@ -419,7 +418,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
                     noDataAlertState=alert["no_data_alert_state"],
                     errorAlertState=alert["execute_error_alert_state"],
                     evaluateFor=self.evaluateFor,
-                    uid=self.uid_prefix + str(_id),
+                    uid=create_uid_from_string(alert["title"]),
                     panel_id=alert["panelId"],
                     dashboard_uid=self.dashboard_uid,
                 )
