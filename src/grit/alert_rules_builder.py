@@ -131,7 +131,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
     A class for building CloudWatch alert rules.
     """
 
-    def __init__(self, environment, evaluateFor, uid_prefix, metric_namespace, dashboard_uid):
+    def __init__(self, environment, evaluateFor, metric_namespace, dashboard_uid, uid_prefix=""):
         super().__init__(environment, evaluateFor, dashboard_uid)
         self.metric_namespace = metric_namespace
 
