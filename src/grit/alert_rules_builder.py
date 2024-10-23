@@ -1,6 +1,6 @@
 from attr import define, field
 
-import grafanalib.core
+from .utilities import create_uid_from_string
 
 from grafanalib.core import (
     AlertExpression,
@@ -164,7 +164,7 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
                     noDataAlertState=alert["no_data_alert_state"],
                     errorAlertState=alert["execute_error_alert_state"],
                     evaluateFor=self.evaluateFor,
-                    uid=self.uid_prefix + str(_id),
+                    uid=create_uid_from_string(alert["title"]),
                     panel_id=alert["panelId"],
                     dashboard_uid=self.dashboard_uid,
                 )
