@@ -27,7 +27,7 @@ def row8(*args: Panel):
     return Row(8, *args)
 
 
-def create_uid_from_string(input_string):
+def create_uid_from_string(input_string, length=40):
     # Convert the input string to bytes
     input_bytes = input_string.encode('utf-8')
 
@@ -35,6 +35,6 @@ def create_uid_from_string(input_string):
     hash_object = hashlib.sha256(input_bytes)
 
     # Get the hexadecimal representation of the hash
-    uid = hash_object.hexdigest()
+    uid = hash_object.hexdigest()[:length]
 
     return uid
