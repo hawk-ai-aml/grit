@@ -5,7 +5,7 @@ from .utilities import create_uid_from_string
 from grafanalib.core import (
     AlertExpression,
     EXP_TYPE_REDUCE, EXP_TYPE_MATH, EXP_REDUCER_FUNC_DROP_NN, EXP_REDUCER_FUNC_LAST,
-    AlertRulev11, TimeRange, ALERTRULE_STATE_DATA_ALERTING, ALERTRULE_STATE_DATA_NODATA_V11
+    AlertRulev11, TimeRange, ALERTRULE_STATE_DATA_ALERTING, ALERTRULE_STATE_DATA_KEEPLAST_V11
 )
 
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
@@ -35,7 +35,7 @@ class AlertRuleBuilder(ABC):
 
     def register(self, title, metric, alert_expression, alert_msg, labels, panelId,
                  reduce_function=EXP_REDUCER_FUNC_LAST, time_range=TimeRange('5m', 'now'),
-                 no_data_alert_state=ALERTRULE_STATE_DATA_NODATA_V11, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
+                 no_data_alert_state=ALERTRULE_STATE_DATA_KEEPLAST_V11, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
         """
         Register a new alert rule.
 
@@ -329,7 +329,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
                  alert_expression, alert_msg,
                  labels, panelId, interval_ms=1000, apply_auto_bucket_agg_ids_function=False,
                  metric_aggs=[CountMetricAgg()], time_range=TimeRange('5m', 'now'),
-                 no_data_alert_state=ALERTRULE_STATE_DATA_NODATA_V11, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
+                 no_data_alert_state=ALERTRULE_STATE_DATA_KEEPLAST_V11, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
         """
         Register a new alert rule.
 
