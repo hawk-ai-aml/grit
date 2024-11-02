@@ -54,7 +54,8 @@ class AlertRuleBuilder(ABC):
             "alert_expression": alert_expression,
             "time_range": time_range,
             "annotations": {
-                "summary": alert_msg
+                "summary": alert_msg,
+                "slack_group_id": self.environment.slack_group_id,
             },
             "labels": labels,
             "panelId": panelId,
@@ -355,6 +356,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
             "time_range": time_range,
             "annotations": {
                 "summary": alert_msg,
+                "slack_group_id": self.environment.slack_group_id,
                 "status": '{{- with $values -}}{{- $lastValue := "" -}}{{- $lastInstance := "" -}}{{- range $k, $v := . -}}{{- $lastValue = $v -}}{{- $lastInstance = $v.Labels -}}{{- end -}}\nInstance: {{ $lastInstance }} | Value:   {{ $lastValue }}{{- end -}}',
             },
             "labels": labels,
