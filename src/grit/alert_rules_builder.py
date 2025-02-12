@@ -5,7 +5,7 @@ from .utilities import create_uid_from_string
 from grafanalib.core import (
     AlertExpression,
     EXP_TYPE_REDUCE, EXP_TYPE_MATH, EXP_REDUCER_FUNC_DROP_NN, EXP_REDUCER_FUNC_LAST,
-    AlertRulev11, TimeRange, ALERTRULE_STATE_DATA_ALERTING, ALERTRULE_STATE_DATA_KEEPLAST_V11
+    AlertRulev11, TimeRange, ALERTRULE_STATE_DATA_ALERTING, ALERTRULE_STATE_DATA_OK
 )
 
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
@@ -19,7 +19,7 @@ class AlertRuleBuilder(ABC):
     An interface class for building alert rules.
     """
 
-    def __init__(self, environment, evaluateFor, dashboard_uid, datasource=None, uid_prefix=""):
+    def __init__(self, environment, evaluateFor, dashboard_uid, datasource=None):
         """
         Initialize the AlertRuleBuilder.
 
@@ -35,7 +35,7 @@ class AlertRuleBuilder(ABC):
 
     def register(self, title, metric, alert_expression, alert_msg, labels, panelId,
                  reduce_function=EXP_REDUCER_FUNC_LAST, time_range=TimeRange('5m', 'now'),
-                 no_data_alert_state=ALERTRULE_STATE_DATA_KEEPLAST_V11, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
+                 no_data_alert_state=ALERTRULE_STATE_DATA_OK, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
         """
         Register a new alert rule.
 
@@ -69,7 +69,7 @@ class AlertRuleBuilder(ABC):
         self.rules.append(rule)
 
     @abstractmethod
-    def build(self, uid_prefix):
+    def build(self):
         """
         Build the alert rules.
         """
@@ -81,7 +81,6 @@ class AlertRuleBuilder(ABC):
         Build the alert rules for all instances of AlertRuleBuilder.
 
         Args:
-            uid_prefix (str): The prefix to be added to the UID of each alert rule.
             *alert_rule_builders (AlertRuleBuilder): Variable number of AlertRuleBuilder instances.
 
         Returns:
@@ -132,16 +131,13 @@ class CloudwatchAlertRuleBuilder(AlertRuleBuilder):
     A class for building CloudWatch alert rules.
     """
 
-    def __init__(self, environment, evaluateFor, metric_namespace, dashboard_uid, uid_prefix=""):
+    def __init__(self, environment, evaluateFor, metric_namespace, dashboard_uid):
         super().__init__(environment, evaluateFor, dashboard_uid)
         self.metric_namespace = metric_namespace
 
     def build(self):
         """
         Build the CloudWatch alert rules.
-
-        Args:
-            uid_prefix (str): The prefix to be added to the UID of each alert rule.
 
         Returns:
             list: A list of AlertRulev11 objects representing the built alert rules.
@@ -241,9 +237,6 @@ class PrometheusAlertRuleBuilder(AlertRuleBuilder):
         """
         Build the Prometheus alert rules.
 
-        Args:
-            uid_prefix (str): The prefix to be added to the UID of each alert rule.
-
         Returns:
             list: A list of AlertRulev11 objects representing the built alert rules.
         """
@@ -330,7 +323,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
                  alert_expression, alert_msg,
                  labels, panelId, interval_ms=1000, apply_auto_bucket_agg_ids_function=False,
                  metric_aggs=[CountMetricAgg()], time_range=TimeRange('5m', 'now'),
-                 no_data_alert_state=ALERTRULE_STATE_DATA_KEEPLAST_V11, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
+                 no_data_alert_state=ALERTRULE_STATE_DATA_OK, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
         """
         Register a new alert rule.
 
@@ -375,9 +368,6 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
     def build(self):
         """
         Build the CloudWatch alert rules.
-
-        Args:
-            uid_prefix (str): The prefix to be added to the UID of each alert rule.
 
         Returns:
             list: A list of AlertRulev11 objects representing the built alert rules.
