@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Any
 import os
+import attr
 
-from grafanalib.core import Dashboard, AlertFileBasedProvisioning
+from grafanalib.core import Dashboard, AlertFileBasedProvisioning, Templating
 
 from grit import DashboardEncoder, json
 
@@ -38,7 +39,7 @@ class GritOut(ABC):
         """Optional: Initialize alerts for the dashboard."""
         print("Default init__alerts method. Override if needed.")
 
-    def init_dashboard(self, datasource, templating=[]) -> None:
+    def init_dashboard(self, datasource, templating=attr.Factory(Templating)) -> None:
         """Initialize the GritDash Object and adds it to the processing list
 
         Args:
@@ -51,6 +52,7 @@ class GritOut(ABC):
                 uid=self.DASHBOARD_UUID,
                 title=self.DASHBOARD_TITLE,
                 dataSource=datasource,
+                templating=templating,
                 description="This panel has been provisioned. Manual changes on the panel will be overridden if they are not persisted.",
                 tags=['hawk'],
                 stack=self.stack()
