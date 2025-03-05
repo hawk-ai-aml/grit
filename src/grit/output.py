@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any
 import os
-import attr
 
 from grafanalib.core import Dashboard, AlertFileBasedProvisioning, Templating
 
@@ -39,7 +38,7 @@ class GritOut(ABC):
         """Optional: Initialize alerts for the dashboard."""
         print("Default init__alerts method. Override if needed.")
 
-    def init_dashboard(self, datasource, templating=attr.Factory(Templating)) -> None:
+    def init_dashboard(self, datasource, templating=Templating()) -> None:
         """Initialize the GritDash Object and adds it to the processing list
 
         Args:
