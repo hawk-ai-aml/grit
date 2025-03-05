@@ -319,9 +319,9 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
     A class for building ElasticSearchTarget alert rules.
     """
 
-    def register(self, title, bucket_aggs, query, datasource, reduce_function,
+    def register(self, title, bucket_aggs, reduce_function,
                  alert_expression, alert_msg,
-                 labels, panelId, interval_ms=1000, apply_auto_bucket_agg_ids_function=False,
+                 labels, query="", datasource="", panelId=-1, panel=None, interval_ms=1000, apply_auto_bucket_agg_ids_function=False,
                  metric_aggs=[CountMetricAgg()], time_range=TimeRange('5m', 'now'),
                  no_data_alert_state=ALERTRULE_STATE_DATA_OK, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
         """
@@ -337,6 +337,12 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
             panelId (str): The panel ID associated with the alert rule.
             time_range (TimeRange): The time range for the alert rule. Default is '5m' to 'now'.
         """
+
+        if panel:
+            panelId = panel.panelId
+            query = panel.targets[0].query
+            datasource = panel.dataSource
+
         rule = {
             "title": title,
             "query": query,
