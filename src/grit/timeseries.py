@@ -18,7 +18,7 @@ class TimeSeriesWrapper(TimeSeries):
         labels = kwargs.get("labels", {})
         alert_msg = kwargs.get("alert_msg", "NOT_IMPLEMENTED")
         env = kwargs.get("env", None)
-        alert_suffix = kwargs.get("alert_suffix", "")
+        team = kwargs.get("team", "")
         reduce_function = kwargs.get("reduce_function", "sum")
         bucket_aggs = kwargs.get("bucket_aggs", [])
 
@@ -39,7 +39,7 @@ class TimeSeriesWrapper(TimeSeries):
         if isinstance(builder, ElasticSearchAlertRuleBuilder):
             builder.register(
                 panel=self,
-                title=f"[{env}]".upper() + " " + title + " | " + alert_suffix,
+                title=f"[{env}]".upper() + " " + title + " | " + team,
                 bucket_aggs=bucket_aggs,
                 reduce_function=reduce_function,
                 alert_expression="$REDUCE_EXPRESSION " + str(threshold),
@@ -50,7 +50,7 @@ class TimeSeriesWrapper(TimeSeries):
         elif isinstance(builder, PrometheusAlertRuleBuilder):
             builder.register(
                 panel=self,
-                title=f"[{env}]".upper() + " " + title + " | " + alert_suffix,
+                title=f"[{env}]".upper() + " " + title + " | " + team,
                 metric={
                     "expr": self.targets[0].expr,
                     "legendFormat": self.targets[0].legendFormat,
@@ -61,5 +61,7 @@ class TimeSeriesWrapper(TimeSeries):
                 labels=labels,
                 time_range=TimeRange(time_from, time_shift)
             )
+        elif isinstance(builder, CloudwatchAlertRuleBuilder):
+            raise NotImplementedError("This method should not be used yet.")
 
         return self
