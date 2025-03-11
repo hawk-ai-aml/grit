@@ -42,7 +42,7 @@ class TimeSeriesWrapper(TimeSeries):
                 title=f"[{env}]".upper() + " " + title + " | " + alert_suffix,
                 bucket_aggs=bucket_aggs,
                 reduce_function=reduce_function,
-                alert_expression="$REDUCE_EXPRESSION > " + str(threshold),
+                alert_expression="$REDUCE_EXPRESSION " + str(threshold),
                 alert_msg=alert_msg,
                 labels=labels,
                 time_range=TimeRange(time_from, time_shift)
@@ -56,7 +56,7 @@ class TimeSeriesWrapper(TimeSeries):
                     "legendFormat": self.targets[0].legendFormat,
                 },
                 reduce_function=reduce_function,
-                alert_expression="$REDUCE_EXPRESSION > " + str(threshold),
+                alert_expression="$REDUCE_EXPRESSION " + str(threshold),
                 alert_msg=alert_msg,
                 labels=labels,
                 time_range=TimeRange(time_from, time_shift)
