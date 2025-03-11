@@ -1,20 +1,24 @@
 from abc import ABC, abstractmethod
 from typing import Any
 import os
+from attr import define
 
 from grafanalib.core import Dashboard, AlertFileBasedProvisioning, Templating
 
 from grit import DashboardEncoder, json
 
+@define
 class GritOut(ABC):
     """
     Interface for Grit dashboard components.
     Ensures consistent structure for dashboard classes like EXCEPTIONS.
     """
 
-    # Class attributes expected in EXCEPTIONS
+    # Class attributes expected in GritOut subclasses
     DASHBOARD_TITLE: str
     DASHBOARD_UUID: str
+
+    ALERT_RULE_BUILDER: list
 
     def __init__(self, environment: Any, datasources: Any, services: list[str]=[], folder_name: str=""):
         """
@@ -72,7 +76,7 @@ class GritOut(ABC):
                 uid="{}-alerts".format(self.DASHBOARD_UUID),
                 groups=[AlertGroup(
                     name=self.DASHBOARD_TITLE,
-                    rules=AlertRuleBuilder.build_all(self.es_alerts),
+                    rules=AlertRuleBuilder.build_all(*self.ALERT_RULE_BUILDER),
                     folder=self.folder_name,
                     evaluateInterval=evaluateInterval
                 )]
@@ -106,6 +110,7 @@ class GritOut(ABC):
 
         for _obj in self.alert_obj:
             if isinstance(_obj, AlertFileBasedProvisioning):
+                # print(self.ALERT_RULE_BUILDER[0].rules)
                 with open(f"{out_base_dir_alerts}/{_obj.uid}.json", "w") as file:
                     file.write(json.dumps(
                         _obj.to_json_data(), sort_keys=True, indent=2, cls=DashboardEncoder))

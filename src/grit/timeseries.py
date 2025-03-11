@@ -1,16 +1,9 @@
-import inspect
-import sys
-
-from attr import define, field, ib
+from attr import define
 
 from grafanalib.elasticsearch import (
-    ElasticsearchTarget, DateHistogramGroupBy, TermsGroupBy, CountMetricAgg, CardinalityMetricAgg
+    DateHistogramGroupBy
 )
-from grafanalib.core import TimeSeries, GreaterThan, Target, TimeRange
-
-from .helpers import gen_random_str
-
-ALERT_RULES_MAGIC_STR = '__alert_rules__'
+from grafanalib.core import TimeSeries, TimeRange
 
 @define
 class TimeSeriesWrapper(TimeSeries):
@@ -26,13 +19,14 @@ class TimeSeriesWrapper(TimeSeries):
         labels = kwargs.get("labels", {})
         alert_msg = kwargs.get("alert_msg", "NOT_IMPLEMENTED")
         env = kwargs.get("env", None)
+        alert_suffix = kwargs.get("alert_suffix", "")
 
         if not title:
             title = self.title
 
         builder.register(
             panel=self,
-            title=f"[{env}]".upper() + " " + title + " | Pagerduty",
+            title=f"[{env}]".upper() + " " + title + " | " + alert_suffix,
             bucket_aggs=[
                 DateHistogramGroupBy(
                     field='updatedAt',
