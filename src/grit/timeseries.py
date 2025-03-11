@@ -3,7 +3,7 @@ from attr import define
 from grafanalib.elasticsearch import (
     DateHistogramGroupBy
 )
-from grafanalib.core import TimeSeries, TimeRange
+from grafanalib.core import TimeSeries, TimeRange, GreaterThan
 
 @define
 class TimeSeriesWrapper(TimeSeries):
@@ -15,29 +15,37 @@ class TimeSeriesWrapper(TimeSeries):
     def add_alert(self, *args, **kwargs):
         title = kwargs.get("title", "")
         builder = kwargs.get("builder", None)
-        threshold = kwargs.get("threshold", 0)
+        threshold = kwargs.get("threshold", GreaterThan(0))
         labels = kwargs.get("labels", {})
         alert_msg = kwargs.get("alert_msg", "NOT_IMPLEMENTED")
         env = kwargs.get("env", None)
         alert_suffix = kwargs.get("alert_suffix", "")
+        reduce_function = kwargs.get("reduce_function", "sum")
+        bucket_aggs = kwargs.get("bucket_aggs", [])
+
+        if not bucket_aggs:
+            bucket_aggs = self.targets[0].bucketAggs
 
         if not title:
             title = self.title
 
+        time_from = kwargs.get("timeFrom", "1h")
+        time_shift = kwargs.get("timeShift", "now")
+        if self.timeFrom:
+            time_from = self.timeFrom
+
+        if self.timeShift:
+            time_shift = self.timeShift
+
         builder.register(
             panel=self,
             title=f"[{env}]".upper() + " " + title + " | " + alert_suffix,
-            bucket_aggs=[
-                DateHistogramGroupBy(
-                    field='updatedAt',
-                    interval='1m'
-                )
-            ],
-            reduce_function="sum",
-            alert_expression="$REDUCE_EXPRESSION > " + threshold,
+            bucket_aggs=bucket_aggs,
+            reduce_function=reduce_function,
+            alert_expression="$REDUCE_EXPRESSION > " + str(threshold),
             alert_msg=alert_msg,
             labels=labels,
-            time_range=TimeRange("24h", "now-15m")
+            time_range=TimeRange(time_from, time_shift)
         )
 
         return self
