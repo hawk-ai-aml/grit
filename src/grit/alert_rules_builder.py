@@ -33,8 +33,8 @@ class AlertRuleBuilder(ABC):
 
         self.datasource = datasource
 
-    def register(self, title, metric, alert_expression, alert_msg, labels, panelId,
-                 reduce_function=EXP_REDUCER_FUNC_LAST, time_range=TimeRange('5m', 'now'),
+    def register(self, title, metric, alert_expression, alert_msg, labels, panelId=-1,
+                 reduce_function=EXP_REDUCER_FUNC_LAST, panel=None, time_range=TimeRange('5m', 'now'),
                  no_data_alert_state=ALERTRULE_STATE_DATA_OK, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
         """
         Register a new alert rule.
@@ -47,6 +47,10 @@ class AlertRuleBuilder(ABC):
             labels (dict): The labels associated with the alert rule.
             panelId (str): The panel ID associated with the alert rule.
         """
+
+        if panel:
+            panelId = panel.panelId
+
         rule = {
             "title": title,
             "metric": metric,
