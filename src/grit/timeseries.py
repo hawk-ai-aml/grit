@@ -1,9 +1,8 @@
 from attr import define
 
-from grafanalib.elasticsearch import (
-    DateHistogramGroupBy
-)
 from grafanalib.core import TimeSeries, TimeRange, GreaterThan
+
+from grit import CloudwatchAlertRuleBuilder, PrometheusAlertRuleBuilder, ElasticSearchAlertRuleBuilder
 
 @define
 class TimeSeriesWrapper(TimeSeries):
@@ -23,7 +22,7 @@ class TimeSeriesWrapper(TimeSeries):
         reduce_function = kwargs.get("reduce_function", "sum")
         bucket_aggs = kwargs.get("bucket_aggs", [])
 
-        if not bucket_aggs:
+        if not bucket_aggs and hasattr(self.targets[0], 'bucketAggs'):
             bucket_aggs = self.targets[0].bucketAggs
 
         if not title:
@@ -37,15 +36,30 @@ class TimeSeriesWrapper(TimeSeries):
         if self.timeShift:
             time_shift = self.timeShift
 
-        builder.register(
-            panel=self,
-            title=f"[{env}]".upper() + " " + title + " | " + alert_suffix,
-            bucket_aggs=bucket_aggs,
-            reduce_function=reduce_function,
-            alert_expression="$REDUCE_EXPRESSION > " + str(threshold),
-            alert_msg=alert_msg,
-            labels=labels,
-            time_range=TimeRange(time_from, time_shift)
-        )
+        if isinstance(builder, ElasticSearchAlertRuleBuilder):
+            builder.register(
+                panel=self,
+                title=f"[{env}]".upper() + " " + title + " | " + alert_suffix,
+                bucket_aggs=bucket_aggs,
+                reduce_function=reduce_function,
+                alert_expression="$REDUCE_EXPRESSION > " + str(threshold),
+                alert_msg=alert_msg,
+                labels=labels,
+                time_range=TimeRange(time_from, time_shift)
+            )
+        elif isinstance(builder, PrometheusAlertRuleBuilder):
+            builder.register(
+                panel=self,
+                title=f"[{env}]".upper() + " " + title + " | " + alert_suffix,
+                metric={
+                    "expr": self.targets[0].expr,
+                    "legendFormat": self.targets[0].legendFormat,
+                },
+                reduce_function=reduce_function,
+                alert_expression="$REDUCE_EXPRESSION > " + str(threshold),
+                alert_msg=alert_msg,
+                labels=labels,
+                time_range=TimeRange(time_from, time_shift)
+            )
 
         return self
