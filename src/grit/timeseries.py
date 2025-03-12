@@ -19,7 +19,7 @@ class TimeSeriesWrapper(TimeSeries):
         alert_msg = kwargs.get("alert_msg", "NOT_IMPLEMENTED")
         env = kwargs.get("env", None)
         team = kwargs.get("team", "")
-        reduce_function = kwargs.get("reduce_function", "sum")
+        reduce_function = kwargs.get("reduce_function", "last")
         bucket_aggs = kwargs.get("bucket_aggs", [])
 
         if not bucket_aggs and hasattr(self.targets[0], 'bucketAggs'):
