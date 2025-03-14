@@ -36,10 +36,14 @@ class TimeSeriesWrapper(TimeSeries):
         if self.timeShift:
             time_shift = self.timeShift
 
+        _title=f"[{env}]".upper() + " " + title
+        if team:
+            _title += " | " + team
+
         if isinstance(builder, ElasticSearchAlertRuleBuilder):
             builder.register(
                 panel=self,
-                title=f"[{env}]".upper() + " " + title + " | " + team,
+                title=_title,
                 bucket_aggs=bucket_aggs,
                 reduce_function=reduce_function,
                 alert_expression="$REDUCE_EXPRESSION " + str(threshold),
@@ -50,7 +54,7 @@ class TimeSeriesWrapper(TimeSeries):
         elif isinstance(builder, PrometheusAlertRuleBuilder):
             builder.register(
                 panel=self,
-                title=f"[{env}]".upper() + " " + title + " | " + team,
+                title=_title,
                 metric={
                     "expr": self.targets[0].expr,
                     "legendFormat": self.targets[0].legendFormat,
