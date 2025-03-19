@@ -66,6 +66,19 @@ class TimeSeriesWrapper(TimeSeries):
                 time_range=TimeRange(time_from, time_shift)
             )
         elif isinstance(builder, CloudwatchAlertRuleBuilder):
-            raise NotImplementedError("This method should not be used yet.")
+            builder.register(
+                panel=self,
+                title=_title,
+                metric={
+                    "name": self.targets[0].metricName,
+                    "statistics": self.targets[0].statistics,
+                    "dimensions": self.targets[0].dimensions,
+                },
+                time_range=TimeRange(time_from, time_shift),
+                reduce_function=reduce_function,
+                alert_expression="$REDUCE_EXPRESSION " + str(threshold),
+                alert_msg=alert_msg,
+                labels=labels
+            )
 
         return self
