@@ -2,6 +2,8 @@ from attr import define
 
 from grafanalib.core import TimeSeries, TimeRange, GreaterThan
 
+from grafanalib.elasticsearch import CountMetricAgg
+
 from grit import CloudwatchAlertRuleBuilder, PrometheusAlertRuleBuilder, ElasticSearchAlertRuleBuilder
 
 @define
@@ -21,9 +23,8 @@ class TimeSeriesWrapper(TimeSeries):
         team = kwargs.get("team", "")
         reduce_function = kwargs.get("reduce_function", "last")
         bucket_aggs = kwargs.get("bucket_aggs", [])
-
-        if not bucket_aggs and hasattr(self.targets[0], 'bucketAggs'):
-            bucket_aggs = self.targets[0].bucketAggs
+        metricAggs = kwargs.get("metricAggs", [])
+        metric = kwargs.get("metric", None)
 
         if not title:
             title = self.title
@@ -41,10 +42,21 @@ class TimeSeriesWrapper(TimeSeries):
             _title += " | " + team
 
         if isinstance(builder, ElasticSearchAlertRuleBuilder):
+
+            if not bucket_aggs and hasattr(self.targets[0], 'bucketAggs'):
+                bucket_aggs = self.targets[0].bucketAggs
+
+            if not metricAggs:
+                if hasattr(self.targets[0], 'metricAggs'):
+                    metricAggs = self.targets[0].metricAggs
+                else:
+                    metricAggs = [CountMetricAgg()]
+
             builder.register(
                 panel=self,
                 title=_title,
                 bucket_aggs=bucket_aggs,
+                metric_aggs=metricAggs,
                 reduce_function=reduce_function,
                 alert_expression="$REDUCE_EXPRESSION " + str(threshold),
                 alert_msg=alert_msg,
@@ -52,13 +64,15 @@ class TimeSeriesWrapper(TimeSeries):
                 time_range=TimeRange(time_from, time_shift)
             )
         elif isinstance(builder, PrometheusAlertRuleBuilder):
+            if not metric:
+                metric = {
+                    "expr": self.targets[0].expr,
+                    "legendFormat": self.targets[0].legendFormat,
+                }
             builder.register(
                 panel=self,
                 title=_title,
-                metric={
-                    "expr": self.targets[0].expr,
-                    "legendFormat": self.targets[0].legendFormat,
-                },
+                metric=metric,
                 reduce_function=reduce_function,
                 alert_expression="$REDUCE_EXPRESSION " + str(threshold),
                 alert_msg=alert_msg,
@@ -66,14 +80,16 @@ class TimeSeriesWrapper(TimeSeries):
                 time_range=TimeRange(time_from, time_shift)
             )
         elif isinstance(builder, CloudwatchAlertRuleBuilder):
-            builder.register(
-                panel=self,
-                title=_title,
+            if not metric:
                 metric={
                     "name": self.targets[0].metricName,
                     "statistics": self.targets[0].statistics,
                     "dimensions": self.targets[0].dimensions,
                 },
+            builder.register(
+                panel=self,
+                title=_title,
+                metric=metric,
                 time_range=TimeRange(time_from, time_shift),
                 reduce_function=reduce_function,
                 alert_expression="$REDUCE_EXPRESSION " + str(threshold),
