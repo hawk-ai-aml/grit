@@ -3,7 +3,7 @@ from typing import Any
 import os
 from attr import define
 
-from grafanalib.core import Dashboard, AlertFileBasedProvisioning, Templating
+from grafanalib.core import Dashboard, AlertFileBasedProvisioning, Templating, Time
 
 from grit import DashboardEncoder, json
 
@@ -42,7 +42,7 @@ class GritOut(ABC):
         """Optional: Initialize alerts for the dashboard."""
         print("Default init__alerts method. Override if needed.")
 
-    def init_dashboard(self, datasource, templating=Templating()) -> None:
+    def init_dashboard(self, datasource, templating=Templating(), time=Time('now-1h', 'now')) -> None:
         """Initialize the GritDash Object and adds it to the processing list
 
         Args:
@@ -54,6 +54,7 @@ class GritOut(ABC):
             GritDash(
                 uid=self.DASHBOARD_UUID,
                 title=self.DASHBOARD_TITLE,
+                time=time,
                 dataSource=datasource,
                 templating=templating,
                 description="This panel has been provisioned. Manual changes on the panel will be overridden if they are not persisted.",
