@@ -24,7 +24,6 @@ class TimeSeriesWrapper(TimeSeries):
         reduce_function = kwargs.get("reduce_function", "last")
         bucket_aggs = kwargs.get("bucket_aggs", [])
         metricAggs = kwargs.get("metricAggs", [])
-        metric = kwargs.get("metric", None)
 
         if not title:
             title = self.title
@@ -64,15 +63,13 @@ class TimeSeriesWrapper(TimeSeries):
                 time_range=TimeRange(time_from, time_shift)
             )
         elif isinstance(builder, PrometheusAlertRuleBuilder):
-            if not metric:
-                metric = {
-                    "expr": self.targets[0].expr,
-                    "legendFormat": self.targets[0].legendFormat,
-                }
             builder.register(
                 panel=self,
                 title=_title,
-                metric=metric,
+                metric={
+                    "expr": self.targets[0].expr,
+                    "legendFormat": self.targets[0].legendFormat,
+                },
                 reduce_function=reduce_function,
                 alert_expression="$REDUCE_EXPRESSION " + str(threshold),
                 alert_msg=alert_msg,
@@ -80,16 +77,14 @@ class TimeSeriesWrapper(TimeSeries):
                 time_range=TimeRange(time_from, time_shift)
             )
         elif isinstance(builder, CloudwatchAlertRuleBuilder):
-            if not metric:
+            builder.register(
+                panel=self,
+                title=_title,
                 metric={
                     "name": self.targets[0].metricName,
                     "statistics": self.targets[0].statistics,
                     "dimensions": self.targets[0].dimensions,
                 },
-            builder.register(
-                panel=self,
-                title=_title,
-                metric=metric,
                 time_range=TimeRange(time_from, time_shift),
                 reduce_function=reduce_function,
                 alert_expression="$REDUCE_EXPRESSION " + str(threshold),
