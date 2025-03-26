@@ -22,8 +22,6 @@ class TimeSeriesWrapper(TimeSeries):
         env = kwargs.get("env", None)
         team = kwargs.get("team", "")
         reduce_function = kwargs.get("reduce_function", "last")
-        bucket_aggs = kwargs.get("bucket_aggs", [])
-        metricAggs = kwargs.get("metricAggs", [])
 
         if not title:
             title = self.title
@@ -42,6 +40,10 @@ class TimeSeriesWrapper(TimeSeries):
 
         if isinstance(builder, ElasticSearchAlertRuleBuilder):
 
+            bucket_aggs = kwargs.get("bucket_aggs", [])
+            metricAggs = kwargs.get("metricAggs", [])
+            query = kwargs.get("query", "")
+
             if not bucket_aggs and hasattr(self.targets[0], 'bucketAggs'):
                 bucket_aggs = self.targets[0].bucketAggs
 
@@ -54,6 +56,7 @@ class TimeSeriesWrapper(TimeSeries):
             builder.register(
                 panel=self,
                 title=_title,
+                query=query,
                 bucket_aggs=bucket_aggs,
                 metric_aggs=metricAggs,
                 reduce_function=reduce_function,

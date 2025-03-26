@@ -344,8 +344,12 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
 
         if panel:
             panelId = panel.panelId
-            query = panel.targets[0].query
-            datasource = panel.dataSource
+
+            if not datasource:
+                datasource = panel.dataSource
+
+            if not query:
+                query = panel.targets[0].query
 
         rule = {
             "title": title,
