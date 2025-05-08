@@ -59,7 +59,8 @@ class AlertRuleBuilder(ABC):
             "time_range": time_range,
             "annotations": {
                 "summary": alert_msg,
-                "slack_godparents_group_id": self.environment.slack_godparents_group_id,
+                "slack_godparents_group_id_short": self.environment.slack_godparents_group_id,
+                "slack_godparents_group_id": f"<!subteam^{self.environment.slack_godparents_group_id}>",
             },
             "labels": labels,
             "panelId": panelId,
@@ -363,7 +364,8 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
             "time_range": time_range,
             "annotations": {
                 "summary": alert_msg,
-                "slack_godparents_group_id": self.environment.slack_godparents_group_id,
+                "slack_godparents_group_id_short": self.environment.slack_godparents_group_id,
+                "slack_godparents_group_id": f"<!subteam^{self.environment.slack_godparents_group_id}>",
                 "status": '{{- with $values -}}{{- $lastValue := "" -}}{{- $lastInstance := "" -}}{{- range $k, $v := . -}}{{- $lastValue = $v -}}{{- $lastInstance = $v.Labels -}}{{- end -}}\nInstance: {{ $lastInstance }} | Value:   {{ $lastValue }}{{- end -}}',
             },
             "labels": labels,
