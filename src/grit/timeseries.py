@@ -42,6 +42,7 @@ class TimeSeriesWrapper(TimeSeries):
 
             bucket_aggs = kwargs.get("bucket_aggs", [])
             metricAggs = kwargs.get("metricAggs", [])
+            apply_auto_bucket_agg_ids_function = kwargs.get("apply_auto_bucket_agg_ids_function", False)
             query = kwargs.get("query", "")
 
             if not bucket_aggs and hasattr(self.targets[0], 'bucketAggs'):
@@ -59,6 +60,7 @@ class TimeSeriesWrapper(TimeSeries):
                 query=query,
                 bucket_aggs=bucket_aggs,
                 metric_aggs=metricAggs,
+                apply_auto_bucket_agg_ids_function=apply_auto_bucket_agg_ids_function,
                 reduce_function=reduce_function,
                 alert_expression="$REDUCE_EXPRESSION " + str(threshold),
                 alert_msg=alert_msg,
