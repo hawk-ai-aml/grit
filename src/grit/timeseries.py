@@ -1,6 +1,6 @@
 from attr import define
 
-from grafanalib.core import TimeSeries, TimeRange, GreaterThan
+from grafanalib.core import TimeSeries, TimeRange, GreaterThan, ALERTRULE_STATE_DATA_OK
 
 from grafanalib.elasticsearch import CountMetricAgg
 
@@ -22,6 +22,8 @@ class TimeSeriesWrapper(TimeSeries):
         env = kwargs.get("env", None)
         team = kwargs.get("team", "")
         reduce_function = kwargs.get("reduce_function", "last")
+        no_data_alert_state = kwargs.get("no_data_alert_state", ALERTRULE_STATE_DATA_OK)
+        
 
         if not title:
             title = self.title
@@ -65,7 +67,8 @@ class TimeSeriesWrapper(TimeSeries):
                 alert_expression="$REDUCE_EXPRESSION " + str(threshold),
                 alert_msg=alert_msg,
                 labels=labels,
-                time_range=TimeRange(time_from, time_shift)
+                time_range=TimeRange(time_from, time_shift),
+                no_data_alert_state=no_data_alert_state
             )
         elif isinstance(builder, PrometheusAlertRuleBuilder):
             builder.register(
@@ -79,7 +82,8 @@ class TimeSeriesWrapper(TimeSeries):
                 alert_expression="$REDUCE_EXPRESSION " + str(threshold),
                 alert_msg=alert_msg,
                 labels=labels,
-                time_range=TimeRange(time_from, time_shift)
+                time_range=TimeRange(time_from, time_shift),
+                no_data_alert_state=no_data_alert_state
             )
         elif isinstance(builder, CloudwatchAlertRuleBuilder):
             builder.register(
@@ -94,7 +98,8 @@ class TimeSeriesWrapper(TimeSeries):
                 reduce_function=reduce_function,
                 alert_expression="$REDUCE_EXPRESSION " + str(threshold),
                 alert_msg=alert_msg,
-                labels=labels
+                labels=labels,
+                no_data_alert_state=no_data_alert_state
             )
 
         return self
