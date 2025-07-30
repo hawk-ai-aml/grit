@@ -329,7 +329,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
     def register(self, title, bucket_aggs, reduce_function,
                  alert_expression, alert_msg,
                  labels, query="", datasource="", panelId=-1, panel=None, interval_ms=1000, apply_auto_bucket_agg_ids_function=False,
-                 metric_aggs=[CountMetricAgg()], time_range=TimeRange('5m', 'now'),
+                 metric_aggs=[CountMetricAgg()], time_range=TimeRange('5m', 'now'), time_field="@timestamp",
                  no_data_alert_state=ALERTRULE_STATE_DATA_OK, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
         """
         Register a new alert rule.
@@ -364,6 +364,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
             "reduce_function": reduce_function,
             "alert_expression": alert_expression,
             "time_range": time_range,
+            "time_field": time_field,
             "annotations": {
                 "summary": alert_msg,
                 "slack_godparents_group_id_short": self.environment.slack_godparents_group_id,
@@ -385,7 +386,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
 
     def build(self):
         """
-        Build the CloudWatch alert rules.
+        Build the Elasticsearch alert rules.
 
         Returns:
             list: A list of AlertRulev11 objects representing the built alert rules.
@@ -398,7 +399,8 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
                 metricAggs=alert["metric_aggs"],
                 intervalMs=alert["interval_ms"],
                 refId='QUERY',
-                datasource=alert["datasource"]
+                datasource=alert["datasource"],
+                timeField=alert["time_field"],
             )
             if alert["apply_auto_bucket_function"]:
                 target = target.auto_bucket_agg_ids()

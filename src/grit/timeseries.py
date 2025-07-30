@@ -23,7 +23,6 @@ class TimeSeriesWrapper(TimeSeries):
         team = kwargs.get("team", "")
         reduce_function = kwargs.get("reduce_function", "last")
         no_data_alert_state = kwargs.get("no_data_alert_state", ALERTRULE_STATE_DATA_OK)
-        
 
         if not title:
             title = self.title
@@ -50,6 +49,8 @@ class TimeSeriesWrapper(TimeSeries):
             if not bucket_aggs and hasattr(self.targets[0], 'bucketAggs'):
                 bucket_aggs = self.targets[0].bucketAggs
 
+            time_field = self.targets[0].bucketAggs[0].field if hasattr(self.targets[0].bucketAggs[0], 'field') else None
+
             if not metricAggs:
                 if hasattr(self.targets[0], 'metricAggs'):
                     metricAggs = self.targets[0].metricAggs
@@ -68,6 +69,7 @@ class TimeSeriesWrapper(TimeSeries):
                 alert_msg=alert_msg,
                 labels=labels,
                 time_range=TimeRange(time_from, time_shift),
+                time_field=time_field,
                 no_data_alert_state=no_data_alert_state
             )
         elif isinstance(builder, PrometheusAlertRuleBuilder):
