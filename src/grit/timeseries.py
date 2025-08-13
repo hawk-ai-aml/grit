@@ -18,11 +18,15 @@ class TimeSeriesWrapper(TimeSeries):
         builder = kwargs.get("builder", None)
         threshold = kwargs.get("threshold", GreaterThan(0))
         labels = kwargs.get("labels", {})
+        grouping = kwargs.get("grouping", "")
         alert_msg = kwargs.get("alert_msg", "NOT_IMPLEMENTED")
         env = kwargs.get("env", None)
         team = kwargs.get("team", "")
         reduce_function = kwargs.get("reduce_function", "last")
         no_data_alert_state = kwargs.get("no_data_alert_state", ALERTRULE_STATE_DATA_OK)
+
+        if grouping:
+            labels["grouping"] = grouping
 
         if not title:
             title = self.title
