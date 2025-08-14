@@ -13,17 +13,41 @@ class TimeSeriesWrapper(TimeSeries):
 
     """
 
+    def build_alert_annotations(self, msg, impact, runbook, call_to_action):
+        """
+        Build alert annotations for the time series.
+
+        :param msg: Alert message
+        :param impact: Impact of the alert
+        :param runbook: Runbook URL
+        :param call_to_action: Call to action text
+        :return: Dictionary of annotations
+        """
+        return {
+            "summary": msg,
+            "impact": impact,
+            "runbook": runbook,
+            "call_to_action": call_to_action,
+        }
+
     def add_alert(self, *args, **kwargs):
         title = kwargs.get("title", "")
         builder = kwargs.get("builder", None)
         threshold = kwargs.get("threshold", GreaterThan(0))
         labels = kwargs.get("labels", {})
         grouping = kwargs.get("grouping", "")
-        alert_msg = kwargs.get("alert_msg", "NOT_IMPLEMENTED")
         env = kwargs.get("env", None)
         team = kwargs.get("team", "")
         reduce_function = kwargs.get("reduce_function", "last")
         no_data_alert_state = kwargs.get("no_data_alert_state", ALERTRULE_STATE_DATA_OK)
+
+
+        alert_annotation = self.build_alert_annotations(
+            msg=kwargs.get("alert_msg", "Please provide an alert message"),
+            impact=kwargs.get("impact", ""),
+            runbook=kwargs.get("runbook", ""),
+            call_to_action=kwargs.get("call_to_action", "")
+        )
 
         if grouping:
             labels["grouping"] = grouping
@@ -70,7 +94,7 @@ class TimeSeriesWrapper(TimeSeries):
                 apply_auto_bucket_agg_ids_function=apply_auto_bucket_agg_ids_function,
                 reduce_function=reduce_function,
                 alert_expression="$REDUCE_EXPRESSION " + str(threshold),
-                alert_msg=alert_msg,
+                alert_annotation=alert_annotation,
                 labels=labels,
                 time_range=TimeRange(time_from, time_shift),
                 time_field=time_field,
@@ -86,7 +110,7 @@ class TimeSeriesWrapper(TimeSeries):
                 },
                 reduce_function=reduce_function,
                 alert_expression="$REDUCE_EXPRESSION " + str(threshold),
-                alert_msg=alert_msg,
+                alert_annotation=alert_annotation,
                 labels=labels,
                 time_range=TimeRange(time_from, time_shift),
                 no_data_alert_state=no_data_alert_state
@@ -103,7 +127,7 @@ class TimeSeriesWrapper(TimeSeries):
                 time_range=TimeRange(time_from, time_shift),
                 reduce_function=reduce_function,
                 alert_expression="$REDUCE_EXPRESSION " + str(threshold),
-                alert_msg=alert_msg,
+                alert_annotation=alert_annotation,
                 labels=labels,
                 no_data_alert_state=no_data_alert_state
             )

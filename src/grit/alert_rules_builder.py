@@ -33,7 +33,7 @@ class AlertRuleBuilder(ABC):
 
         self.datasource = datasource
 
-    def register(self, title, metric, alert_expression, alert_msg, labels, panelId=-1,
+    def register(self, title, metric, alert_expression, alert_annotation, labels, panelId=-1,
                  reduce_function=EXP_REDUCER_FUNC_LAST, panel=None, time_range=TimeRange('5m', 'now'),
                  no_data_alert_state=ALERTRULE_STATE_DATA_OK, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
         """
@@ -43,7 +43,7 @@ class AlertRuleBuilder(ABC):
             title (str): The title of the alert rule.
             metric (dict): The metric configuration for the alert rule.
             alert_expression (str): The expression used to define the alert condition.
-            alert_msg (str): The summary message for the alert.
+            alert_annotation (dict): The annotations for the alert.
             labels (dict): The labels associated with the alert rule.
             panelId (str): The panel ID associated with the alert rule.
         """
@@ -58,7 +58,7 @@ class AlertRuleBuilder(ABC):
             "alert_expression": alert_expression,
             "time_range": time_range,
             "annotations": {
-                "summary": alert_msg,
+                **alert_annotation,
                 "slack_godparents_group_id_short": self.environment.slack_godparents_group_id,
                 "slack_godparents_group_id": f"<!subteam^{self.environment.slack_godparents_group_id}>",
             },
@@ -327,7 +327,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
     """
 
     def register(self, title, bucket_aggs, reduce_function,
-                 alert_expression, alert_msg,
+                 alert_expression, alert_annotation,
                  labels, query="", datasource="", panelId=-1, panel=None, interval_ms=1000, apply_auto_bucket_agg_ids_function=False,
                  metric_aggs=[CountMetricAgg()], time_range=TimeRange('5m', 'now'), time_field="@timestamp",
                  no_data_alert_state=ALERTRULE_STATE_DATA_OK, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
@@ -339,7 +339,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
             metric (dict): The metric configuration for the alert rule.
             reduce_function (str): Function used in reduces expression
             alert_expression (str): The expression used to define the alert condition.
-            alert_msg (str): The summary message for the alert.
+            alert_annotation (dict): The annotations for the alert.
             labels (dict): The labels associated with the alert rule.
             panelId (str): The panel ID associated with the alert rule.
             time_range (TimeRange): The time range for the alert rule. Default is '5m' to 'now'.
@@ -366,7 +366,7 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
             "time_range": time_range,
             "time_field": time_field,
             "annotations": {
-                "summary": alert_msg,
+                **alert_annotation,
                 "slack_godparents_group_id_short": self.environment.slack_godparents_group_id,
                 "slack_godparents_group_id": f"<!subteam^{self.environment.slack_godparents_group_id}>",
                 "status": '{{- with $values -}}{{- $lastValue := "" -}}{{- $lastInstance := "" -}}{{- range $k, $v := . -}}{{- $lastValue = $v -}}{{- $lastInstance = $v.Labels -}}{{- end -}}\nInstance: {{ $lastInstance }} | Value:   {{ $lastValue }}{{- end -}}',
