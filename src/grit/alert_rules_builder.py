@@ -33,7 +33,8 @@ class AlertRuleBuilder(ABC):
 
         self.datasource = datasource
 
-    def register(self, title, metric, alert_expression, alert_annotation, labels, panelId=-1,
+    def register(self, title, metric, alert_expression, labels,
+                 alert_annotation={}, alert_msg="", panelId=-1,
                  reduce_function=EXP_REDUCER_FUNC_LAST, panel=None, time_range=TimeRange('5m', 'now'),
                  no_data_alert_state=ALERTRULE_STATE_DATA_OK, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
         """
@@ -47,6 +48,9 @@ class AlertRuleBuilder(ABC):
             labels (dict): The labels associated with the alert rule.
             panelId (str): The panel ID associated with the alert rule.
         """
+
+        if alert_msg:
+            alert_annotation["summary"] = alert_msg
 
         if panel:
             panelId = panel.panelId
@@ -326,9 +330,9 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
     A class for building ElasticSearchTarget alert rules.
     """
 
-    def register(self, title, bucket_aggs, reduce_function,
-                 alert_expression, alert_annotation,
-                 labels, query="", datasource="", panelId=-1, panel=None, interval_ms=1000, apply_auto_bucket_agg_ids_function=False,
+    def register(self, title, bucket_aggs, reduce_function, labels,
+                 alert_expression, alert_annotation={},
+                 alert_msg="", query="", datasource="", panelId=-1, panel=None, interval_ms=1000, apply_auto_bucket_agg_ids_function=False,
                  metric_aggs=[CountMetricAgg()], time_range=TimeRange('5m', 'now'), time_field="@timestamp",
                  no_data_alert_state=ALERTRULE_STATE_DATA_OK, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
         """
@@ -344,6 +348,9 @@ class ElasticSearchAlertRuleBuilder(AlertRuleBuilder):
             panelId (str): The panel ID associated with the alert rule.
             time_range (TimeRange): The time range for the alert rule. Default is '5m' to 'now'.
         """
+
+        if alert_msg:
+            alert_annotation["summary"] = alert_msg
 
         if panel:
             panelId = panel.panelId
