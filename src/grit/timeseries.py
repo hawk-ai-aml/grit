@@ -34,7 +34,7 @@ class TimeSeriesWrapper(TimeSeries):
         title = kwargs.get("title", "")
         builder = kwargs.get("builder", None)
         threshold = kwargs.get("threshold", GreaterThan(0))
-        labels = kwargs.get("labels", {})
+        labels = dict(kwargs.get("labels", {}))
         grouping = kwargs.get("grouping", "")
         env = kwargs.get("env", None)
         team = kwargs.get("team", "")
