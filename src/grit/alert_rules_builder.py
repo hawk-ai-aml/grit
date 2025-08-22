@@ -5,7 +5,7 @@ from .utilities import create_uid_from_string
 from grafanalib.core import (
     AlertExpression,
     EXP_TYPE_REDUCE, EXP_TYPE_MATH, EXP_REDUCER_FUNC_DROP_NN, EXP_REDUCER_FUNC_LAST,
-    AlertRulev11, TimeRange, ALERTRULE_STATE_DATA_ALERTING, ALERTRULE_STATE_DATA_OK, ALERTRULE_STATE_DATA_KEEPLAST_V11
+    AlertRulev11, TimeRange, ALERTRULE_STATE_DATA_OK, ALERTRULE_STATE_DATA_KEEPLAST_V11
 )
 
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
@@ -36,7 +36,7 @@ class AlertRuleBuilder(ABC):
     def register(self, title, metric, alert_expression, labels,
                  alert_annotation={}, alert_msg="", panelId=-1,
                  reduce_function=EXP_REDUCER_FUNC_LAST, panel=None, time_range=TimeRange('5m', 'now'),
-                 no_data_alert_state=ALERTRULE_STATE_DATA_OK, execute_error_alert_state=ALERTRULE_STATE_DATA_ALERTING):
+                 no_data_alert_state=ALERTRULE_STATE_DATA_OK, execute_error_alert_state=ALERTRULE_STATE_DATA_KEEPLAST_V11):
         """
         Register a new alert rule.
 

@@ -1,6 +1,6 @@
 from attr import define
 
-from grafanalib.core import TimeSeries, TimeRange, GreaterThan, ALERTRULE_STATE_DATA_OK
+from grafanalib.core import TimeSeries, TimeRange, GreaterThan, ALERTRULE_STATE_DATA_OK, ALERTRULE_STATE_DATA_KEEPLAST_V11
 
 from grafanalib.elasticsearch import CountMetricAgg
 
@@ -40,6 +40,7 @@ class TimeSeriesWrapper(TimeSeries):
         team = kwargs.get("team", "")
         reduce_function = kwargs.get("reduce_function", "last")
         no_data_alert_state = kwargs.get("no_data_alert_state", ALERTRULE_STATE_DATA_OK)
+        error_alert_state = kwargs.get("execute_error_alert_state", ALERTRULE_STATE_DATA_KEEPLAST_V11)
 
 
         alert_annotation = self.build_alert_annotations(
@@ -98,7 +99,8 @@ class TimeSeriesWrapper(TimeSeries):
                 labels=labels,
                 time_range=TimeRange(time_from, time_shift),
                 time_field=time_field,
-                no_data_alert_state=no_data_alert_state
+                no_data_alert_state=no_data_alert_state,
+                execute_error_alert_state=error_alert_state
             )
         elif isinstance(builder, PrometheusAlertRuleBuilder):
             builder.register(
@@ -113,7 +115,8 @@ class TimeSeriesWrapper(TimeSeries):
                 alert_annotation=alert_annotation,
                 labels=labels,
                 time_range=TimeRange(time_from, time_shift),
-                no_data_alert_state=no_data_alert_state
+                no_data_alert_state=no_data_alert_state,
+                execute_error_alert_state=error_alert_state
             )
         elif isinstance(builder, CloudwatchAlertRuleBuilder):
             builder.register(
@@ -129,7 +132,8 @@ class TimeSeriesWrapper(TimeSeries):
                 alert_expression="$REDUCE_EXPRESSION " + str(threshold),
                 alert_annotation=alert_annotation,
                 labels=labels,
-                no_data_alert_state=no_data_alert_state
+                no_data_alert_state=no_data_alert_state,
+                execute_error_alert_state=error_alert_state
             )
 
         return self
