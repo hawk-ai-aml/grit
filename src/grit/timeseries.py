@@ -126,6 +126,7 @@ class TimeSeriesWrapper(TimeSeries):
                     "name": self.targets[0].metricName,
                     "statistics": self.targets[0].statistics,
                     "dimensions": self.targets[0].dimensions,
+                    "matchExact": self.targets[0].matchExact,
                 },
                 time_range=TimeRange(time_from, time_shift),
                 reduce_function=reduce_function,
