@@ -120,12 +120,13 @@ class GenerateCommand(BaseModel):
                 # TODO: do we want to place in General folder??, it's a special api
                 # if its in root folder, then it makes sense to create it in general folder
 
-                os.makedirs(f"{out_base_dir}/{folder_uid}", exist_ok=True)
-
                 for _obj_name in folder_module.__dict__:
                     _obj = folder_module.__dict__[_obj_name]
 
                     if isinstance(_obj, Dashboard):
+                        if not os.path.exists(f"{out_base_dir}/{folder_uid}"):
+                            os.makedirs(f"{out_base_dir}/{folder_uid}", exist_ok=True)
+
                         with open(f"{out_base_dir}/{folder_uid}/{_obj.uid}.json", "w") as file:
                             file.write(json.dumps(
                                 _obj.to_json_data(), sort_keys=True, indent=2, cls=DashboardEncoder))
