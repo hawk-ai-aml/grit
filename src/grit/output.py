@@ -44,7 +44,7 @@ class GritOut(ABC):
         return self._dashboard_title
     
     @DASHBOARD_TITLE.setter
-    def DASHBORD_TITLE(self, value):
+    def DASHBOARD_TITLE(self, value):
         self._dashboard_title = value
 
     @property
