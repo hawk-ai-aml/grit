@@ -14,11 +14,7 @@ class GritOut(ABC):
     Ensures consistent structure for dashboard classes like EXCEPTIONS.
     """
 
-    # Class attributes expected in GritOut subclasses
-    DASHBOARD_TITLE: str
-    DASHBOARD_UUID: str
 
-    ALERT_RULE_BUILDER: list
 
     def __init__(self, environment: Any, datasources: Any, services: list[str]=[], folder_name: str=""):
         """
@@ -30,6 +26,10 @@ class GritOut(ABC):
             services (List[str]): List of services to monitor.
             folder_name (str): Name of the alert folder.
         """
+        self._alert_rule_builder:list = []
+        self._dashboard_title = ""
+        self._dashboard_uuid = ""
+
         self.environment = environment
         self.datasources = datasources
         self.services = services
@@ -37,6 +37,52 @@ class GritOut(ABC):
 
         self.dash_obj:Dashboard = []
         self.alert_obj:AlertFileBasedProvisioning = []
+
+    @property
+    def DASHBOARD_TITLE(self):
+        """Deprecated: Use `dashboard_title` property instead."""
+        return self._dashboard_title
+    
+    @DASHBOARD_TITLE.setter
+    def DASHBORD_TITLE(self, value):
+        self._dashboard_title = value
+
+    @property
+    def dashboard_title(self):
+        """The title of the dashboard"""
+        return self._dashboard_title
+    
+    @dashboard_title.setter
+    def dashboard_title(self, value):
+        self._dashboard_title = value
+
+    @property
+    def DASHBOARD_UUID(self):
+        """Deprecated: Use `dashboard_uuid` property instead."""
+        return self._dashboard_uuid
+    
+    @DASHBOARD_UUID.setter
+    def DASHBOARD_UUID(self, value):
+        self._dashboard_uuid = value
+
+    @property
+    def dashboard_uuid(self):
+        """The unique identifier for the dashboard"""
+        return self._dashboard_uuid
+    
+    @dashboard_uuid.setter
+    def dashboard_uuid(self, value):
+        self._dashboard_uuid = value
+
+    @property
+    def alert_rule_builder(self):
+        """The list of AlertRuleBuilder objects to append to the group"""
+        return self._alert_rule_builder
+    
+    @property
+    def ALERT_RULE_BUILDER(self):
+        """Deprecated: Use `alert_rule_builder` property instead."""
+        return self._alert_rule_builder
 
     def init__alerts(self) -> None:
         """Optional: Initialize alerts for the dashboard."""
