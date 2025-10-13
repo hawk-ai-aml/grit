@@ -124,8 +124,7 @@ class GenerateCommand(BaseModel):
                     _obj = folder_module.__dict__[_obj_name]
 
                     if isinstance(_obj, Dashboard):
-                        if not os.path.exists(f"{out_base_dir}/{folder_uid}"):
-                            os.makedirs(f"{out_base_dir}/{folder_uid}", exist_ok=True)
+                        os.makedirs(f"{out_base_dir}/{folder_uid}", exist_ok=True)
 
                         with open(f"{out_base_dir}/{folder_uid}/{_obj.uid}.json", "w") as file:
                             file.write(json.dumps(
