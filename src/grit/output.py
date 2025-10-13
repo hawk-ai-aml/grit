@@ -40,7 +40,7 @@ class GritOut(ABC):
 
     @property
     def DASHBOARD_TITLE(self):
-        """Deprecated: Use `dashboard_title` property instead."""
+        """Deprecated: Use `dashboard_title` property instead"""
         return self._dashboard_title
     
     @DASHBOARD_TITLE.setter
@@ -58,7 +58,7 @@ class GritOut(ABC):
 
     @property
     def DASHBOARD_UUID(self):
-        """Deprecated: Use `dashboard_uuid` property instead."""
+        """Deprecated: Use `dashboard_uuid` property instead"""
         return self._dashboard_uuid
     
     @DASHBOARD_UUID.setter
@@ -81,8 +81,13 @@ class GritOut(ABC):
     
     @property
     def ALERT_RULE_BUILDER(self):
-        """Deprecated: Use `alert_rule_builder` property instead."""
+        """Deprecated: Use `alert_rule_builder` property instead"""
         return self._alert_rule_builder
+    
+    @ALERT_RULE_BUILDER.setter
+    def ALERT_RULE_BUILDER(self, value):
+        """Deprecated: Should not set this property (noop)"""
+        print("noop: ALERT_RULE_BUILDER is deprecated / value is only set in constructor")
 
     def init__alerts(self) -> None:
         """Optional: Initialize alerts for the dashboard."""
