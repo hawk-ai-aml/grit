@@ -38,11 +38,13 @@ class GritOut(ABC):
 
     @property
     def DASHBOARD_TITLE(self):
+        print("DASHBOARD_TITLE property is deprecated - use `dashboard_title` property instead")
         """Deprecated: Use `dashboard_title` property instead"""
         return self._dashboard_title
     
     @DASHBOARD_TITLE.setter
     def DASHBOARD_TITLE(self, value):
+        print("DASHBOARD_TITLE property is deprecated - use `dashboard_title` property instead")
         self._dashboard_title = value
 
     @property
@@ -57,10 +59,12 @@ class GritOut(ABC):
     @property
     def DASHBOARD_UUID(self):
         """Deprecated: Use `dashboard_uuid` property instead"""
+        print("DASHBOARD_UUID property is deprecated - use `dashboard_uuid` property instead")
         return self._dashboard_uuid
     
     @DASHBOARD_UUID.setter
     def DASHBOARD_UUID(self, value):
+        print("DASHBOARD_UUID property is deprecated - use `dashboard_uuid` property instead")
         self._dashboard_uuid = value
 
     @property
@@ -80,6 +84,7 @@ class GritOut(ABC):
     @property
     def ALERT_RULE_BUILDER(self):
         """Deprecated: Use `alert_rule_builder` property instead"""
+        print("ALERT_RULE_BUILDER property is deprecated - use `alert_rule_builder` property instead")
         return self._alert_rule_builder
     
     @ALERT_RULE_BUILDER.setter
