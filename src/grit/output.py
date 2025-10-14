@@ -14,12 +14,6 @@ class GritOut(ABC):
     Ensures consistent structure for dashboard classes like EXCEPTIONS.
     """
 
-    # Class attributes expected in GritOut subclasses
-    DASHBOARD_TITLE: str
-    DASHBOARD_UUID: str
-
-    ALERT_RULE_BUILDER: list
-
     def __init__(self, environment: Any, datasources: Any, services: list[str]=[], folder_name: str=""):
         """
         Initialize the GritOut instance.
@@ -30,6 +24,10 @@ class GritOut(ABC):
             services (List[str]): List of services to monitor.
             folder_name (str): Name of the alert folder.
         """
+        self._alert_rule_builder:list = []
+        self._dashboard_title = ""
+        self._dashboard_uuid = ""
+
         self.environment = environment
         self.datasources = datasources
         self.services = services
@@ -37,6 +35,62 @@ class GritOut(ABC):
 
         self.dash_obj:Dashboard = []
         self.alert_obj:AlertFileBasedProvisioning = []
+
+    @property
+    def DASHBOARD_TITLE(self):
+        print("DASHBOARD_TITLE property is deprecated - use `dashboard_title` property instead")
+        """Deprecated: Use `dashboard_title` property instead"""
+        return self._dashboard_title
+    
+    @DASHBOARD_TITLE.setter
+    def DASHBOARD_TITLE(self, value):
+        print("DASHBOARD_TITLE property is deprecated - use `dashboard_title` property instead")
+        self._dashboard_title = value
+
+    @property
+    def dashboard_title(self):
+        """The title of the dashboard"""
+        return self._dashboard_title
+    
+    @dashboard_title.setter
+    def dashboard_title(self, value):
+        self._dashboard_title = value
+
+    @property
+    def DASHBOARD_UUID(self):
+        """Deprecated: Use `dashboard_uuid` property instead"""
+        print("DASHBOARD_UUID property is deprecated - use `dashboard_uuid` property instead")
+        return self._dashboard_uuid
+    
+    @DASHBOARD_UUID.setter
+    def DASHBOARD_UUID(self, value):
+        print("DASHBOARD_UUID property is deprecated - use `dashboard_uuid` property instead")
+        self._dashboard_uuid = value
+
+    @property
+    def dashboard_uuid(self):
+        """The unique identifier for the dashboard"""
+        return self._dashboard_uuid
+    
+    @dashboard_uuid.setter
+    def dashboard_uuid(self, value):
+        self._dashboard_uuid = value
+
+    @property
+    def alert_rule_builder(self):
+        """The list of AlertRuleBuilder objects to append to the group"""
+        return self._alert_rule_builder
+    
+    @property
+    def ALERT_RULE_BUILDER(self):
+        """Deprecated: Use `alert_rule_builder` property instead"""
+        print("ALERT_RULE_BUILDER property is deprecated - use `alert_rule_builder` property instead")
+        return self._alert_rule_builder
+    
+    @ALERT_RULE_BUILDER.setter
+    def ALERT_RULE_BUILDER(self, value):
+        """Deprecated: Should not set this property (noop)"""
+        print("noop: ALERT_RULE_BUILDER property is deprecated / value is only set in constructor")
 
     def init__alerts(self) -> None:
         """Optional: Initialize alerts for the dashboard."""
@@ -52,8 +106,8 @@ class GritOut(ABC):
 
         self.dash_obj.append(
             GritDash(
-                uid=self.DASHBOARD_UUID,
-                title=self.DASHBOARD_TITLE,
+                uid=self.dashboard_uuid,
+                title=self.dashboard_title,
                 time=time,
                 dataSource=datasource,
                 templating=templating,
@@ -74,10 +128,10 @@ class GritOut(ABC):
 
         self.alert_obj.append(
             GritAlert(
-                uid="{}-alerts".format(self.DASHBOARD_UUID),
+                uid="{}-alerts".format(self.dashboard_uuid),
                 groups=[AlertGroup(
-                    name=self.DASHBOARD_TITLE,
-                    rules=AlertRuleBuilder.build_all(*self.ALERT_RULE_BUILDER),
+                    name=self.dashboard_title,
+                    rules=AlertRuleBuilder.build_all(*self.alert_rule_builder),
                     folder=self.folder_name,
                     evaluateInterval=evaluateInterval
                 )]
@@ -105,7 +159,7 @@ class GritOut(ABC):
 
         for _obj in self.dash_obj:
             if isinstance(_obj, Dashboard):
-                with open(f"{out_base_dir}/{self.folder_name}/{self.DASHBOARD_UUID}.json", "w") as file:
+                with open(f"{out_base_dir}/{self.folder_name}/{self.dashboard_uuid}.json", "w") as file:
                     file.write(json.dumps(
                         _obj.to_json_data(), sort_keys=True, indent=2, cls=DashboardEncoder))
 
