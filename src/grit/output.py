@@ -126,17 +126,18 @@ class GritOut(ABC):
         from grit import GritAlert, AlertRuleBuilder
         from grafanalib.core import AlertGroup
 
-        self.alert_obj.append(
-            GritAlert(
-                uid="{}-alerts".format(self.dashboard_uuid),
-                groups=[AlertGroup(
-                    name=self.dashboard_title,
-                    rules=AlertRuleBuilder.build_all(*self.alert_rule_builder),
-                    folder=self.folder_name,
-                    evaluateInterval=evaluateInterval
-                )]
+        if len(self.alert_rule_builder) > 0:
+            self.alert_obj.append(
+                GritAlert(
+                    uid="{}-alerts".format(self.dashboard_uuid),
+                    groups=[AlertGroup(
+                        name=self.dashboard_title,
+                        rules=AlertRuleBuilder.build_all(*self.alert_rule_builder),
+                        folder=self.folder_name,
+                        evaluateInterval=evaluateInterval
+                    )]
+                )
             )
-        )
 
     @abstractmethod
     def stack(self) -> Any:
