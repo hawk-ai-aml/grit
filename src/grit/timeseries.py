@@ -26,7 +26,7 @@ class TimeSeriesWrapper(TimeSeries):
         return {
             "summary": msg,
             "impact": impact,
-            "runbook": runbook,
+            "runbook_url": runbook,
             "call_to_action": call_to_action,
         }
 
